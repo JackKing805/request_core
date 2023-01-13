@@ -1,4 +1,4 @@
-package com.jerry.request_core.additation.interfaces.impl
+package com.jerry.request_core.additation
 
 import android.content.Context
 import com.jerry.request_base.annotations.ConfigRegister

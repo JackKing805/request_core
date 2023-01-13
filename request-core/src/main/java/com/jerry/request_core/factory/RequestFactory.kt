@@ -11,8 +11,8 @@ import com.jerry.rt.core.http.pojo.Response
 import com.jerry.request_core.additation.configuration.DefaultResourcesDispatcher
 import com.jerry.request_core.extensions.IsIConfigResult
 import com.jerry.request_core.extensions.isIConfig
-import com.jerry.request_core.additation.interfaces.impl.DefaultAuthConfigRegister
-import com.jerry.request_core.additation.interfaces.impl.DefaultResourcesDispatcherConfigRegister
+import com.jerry.request_core.additation.DefaultAuthConfigRegister
+import com.jerry.request_core.additation.DefaultResourcesDispatcherConfigRegister
 import java.lang.reflect.Method
 
 

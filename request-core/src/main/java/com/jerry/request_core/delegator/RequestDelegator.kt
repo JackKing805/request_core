@@ -6,7 +6,6 @@ import com.jerry.rt.core.http.pojo.Response
 import com.jerry.request_core.RequestUtils
 import com.jerry.request_core.bean.ParameterBean
 import com.jerry.request_core.factory.RequestFactory
-import com.jerry.request_core.additation.interfaces.IResourcesDispatcher
 import com.jerry.request_core.extensions.parameterToArray
 import com.jerry.request_core.extensions.toObject
 import com.jerry.request_core.additation.configuration.DefaultResourcesDispatcher
@@ -16,12 +15,6 @@ import com.jerry.request_core.utils.ResponseUtils
  * 请求分发
  */
 internal object RequestDelegator {
-    private var resourcesDispatcher: IResourcesDispatcher = DefaultResourcesDispatcher()
-
-    fun setResourcesDispatcher(dispatcher: IResourcesDispatcher){
-        resourcesDispatcher = dispatcher
-    }
-
     fun init(controllers:MutableList<Class<*>>){
         RequestFactory.init(controllers)
     }

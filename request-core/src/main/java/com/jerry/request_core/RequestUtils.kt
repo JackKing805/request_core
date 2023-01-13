@@ -4,7 +4,6 @@ import android.app.Application
 import com.jerry.request_core.config.Config
 import com.jerry.request_core.delegator.RequestDelegator
 import com.jerry.request_core.interfaces.IRequestListener
-import com.jerry.request_core.additation.interfaces.IResourcesDispatcher
 import com.jerry.request_core.service.ServerService
 
 object RequestUtils {
@@ -28,10 +27,6 @@ object RequestUtils {
 
     fun listen(iRequestListener: IRequestListener){
         RequestUtils.iRequestListener = iRequestListener
-    }
-
-    fun setResourcesDispatcher(dispatcher: IResourcesDispatcher){
-        RequestDelegator.setResourcesDispatcher(dispatcher)
     }
 
     internal fun getIRequestListener() = iRequestListener

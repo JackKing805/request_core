@@ -1,6 +1,6 @@
 # request_core
 
-    0.0.4
+    0.0.5
         RtCore:0.1.6
         request_base:0.0.1
 

@@ -12,14 +12,6 @@ android {
         minSdk 26
         targetSdk 33
     }
-
-    buildTypes {
-        release {
-            minifyEnabled true
-            zipAlignEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -39,12 +31,6 @@ dependencies {
     implementation 'com.github.JackKing805:request_base:0.0.1'
 }
 
-task generateSourcesJar(type: Jar){
-    from android.sourceSets.main.java.srcDirs
-    classifier 'sources'
-}
-
-
 afterEvaluate {
     publishing {
         publications {
@@ -52,7 +38,7 @@ afterEvaluate {
                 from components.release
                 groupId = "com.jerry"
                 artifactId = "request-core"
-                version = "0.0.6"
+                version = "0.0.8"
             }
         }
     }

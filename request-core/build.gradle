@@ -39,6 +39,11 @@ dependencies {
     implementation 'com.github.JackKing805:request_base:0.0.1'
 }
 
+task generateSourcesJar(type: Jar){
+    from android.sourceSets.main.java.srcDirs
+    classifier 'sources'
+}
+
 
 afterEvaluate {
     publishing {
@@ -47,7 +52,7 @@ afterEvaluate {
                 from components.release
                 groupId = "com.jerry"
                 artifactId = "request-core"
-                version = "0.0.5"
+                version = "0.0.6"
             }
         }
     }

@@ -8,7 +8,6 @@ import com.jerry.request_core.bean.ParameterBean
 import com.jerry.request_core.factory.RequestFactory
 import com.jerry.request_core.extensions.parameterToArray
 import com.jerry.request_core.extensions.toObject
-import com.jerry.request_core.additation.configuration.DefaultResourcesDispatcher
 import com.jerry.request_core.utils.ResponseUtils
 
 /**

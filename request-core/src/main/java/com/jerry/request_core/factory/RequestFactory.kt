@@ -8,7 +8,6 @@ import com.jerry.request_base.annotations.RequestMethod
 import com.jerry.request_base.interfaces.IConfig
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
-import com.jerry.request_core.additation.configuration.DefaultResourcesDispatcher
 import com.jerry.request_core.extensions.IsIConfigResult
 import com.jerry.request_core.extensions.isIConfig
 import com.jerry.request_core.additation.DefaultAuthConfigRegister
@@ -27,7 +26,6 @@ internal object RequestFactory {
     private val defaultInjects = mutableListOf<Class<*>>(
         DefaultAuthConfigRegister::class.java,
         DefaultResourcesDispatcherConfigRegister::class.java,
-        DefaultResourcesDispatcher::class.java
     )
 
     fun init(injects:MutableList<Class<*>>){

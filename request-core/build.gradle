@@ -31,11 +31,12 @@ android {
 
 dependencies {
     implementation 'androidx.core:core-ktx:1.9.0'
-    //rt
-    api 'com.github.jerryxfl:RtCore:0.1.6'
     //tools
     implementation 'com.blankj:utilcodex:1.31.1'
-    implementation 'com.github.JackKing805:request_base:0.0.1'
+    //rt
+    api 'com.github.jerryxfl:RtCore:0.1.6'
+    //base
+    api 'com.github.JackKing805:request_base:0.0.1'
 }
 
 

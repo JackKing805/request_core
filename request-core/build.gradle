@@ -1,0 +1,53 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
+}
+
+android {
+    namespace 'com.jerry.request_core'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 26
+        targetSdk 33
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            zipAlignEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.9.0'
+    //rt
+    api 'com.github.jerryxfl:RtCore:0.1.6'
+    //tools
+    implementation 'com.blankj:utilcodex:1.31.1'
+    implementation 'com.github.JackKing805:request_base:0.0.1'
+}
+
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = "com.jerry"
+                artifactId = "request-core"
+                version = "0.0.1"
+            }
+        }
+    }
+}

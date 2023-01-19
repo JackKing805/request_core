@@ -12,14 +12,15 @@ import com.jerry.request_core.constants.FileType
 import com.jerry.request_core.extensions.byteArrayFromAssets
 import com.jerry.request_core.extensions.byteArrayFromRaw
 import com.jerry.request_core.extensions.getFileMimeType
+import com.jerry.rt.core.http.pojo.s.IResponse
 import java.io.File
 
 
 object ResponseUtils{
     private val rootDir = Environment.getExternalStorageDirectory().absolutePath
 
-    fun dispatcherError(context: Context, request: Request, response: Response, errorCode: Int) {
-        response.setStatusCode(errorCode)
+    fun dispatcherError(context: Context, request: Request, response: IResponse, errorCode: Int) {
+        response.setResponseStatusCode(errorCode)
         response.write(RtCode.match(errorCode).message, RtContentType.TEXT_HTML.content)
     }
 
@@ -27,7 +28,7 @@ object ResponseUtils{
         context: Context,
         isRestController: Boolean,
         request: Request,
-        response: Response,
+        response: IResponse,
         returnObject: Any?
     ) {
         if (returnObject == null) {

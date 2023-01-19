@@ -21,6 +21,7 @@ import com.jerry.request_core.RequestUtils
 import com.jerry.request_core.constants.Status
 import com.jerry.request_core.delegator.RequestDelegator
 import com.jerry.request_core.extensions.log
+import com.jerry.rt.core.http.pojo.RtResponse
 import java.io.InputStream
 import java.lang.Exception
 
@@ -88,8 +89,20 @@ internal class ServerService: Service() {
                         RequestDelegator.dispatcher(this@ServerService,request,response)
                     }
 
-                    override suspend fun onRtHeartbeatIn(client: Client) {
-                        "onRtHeartbeatIn".log()
+                    override fun onRtClientIn(client: Client, response: RtResponse) {
+                        RequestDelegator.onRtIn(this@ServerService,client,response)
+                    }
+
+                    override fun onRtClientOut(client: Client, rtResponse: RtResponse) {
+                        RequestDelegator.onRtOut(this@ServerService,client,rtResponse)
+                    }
+
+                    override suspend fun onRtHeartbeat(client: Client) {
+
+                    }
+
+                    override suspend fun onRtMessage(request: Request, rtResponse: RtResponse) {
+                        RequestDelegator.onRtMessage(this@ServerService,request,rtResponse)
                     }
                 })
             }

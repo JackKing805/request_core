@@ -11,6 +11,7 @@ import com.jerry.rt.core.http.pojo.Response
 import com.jerry.request_core.extensions.isResources
 import com.jerry.request_core.extensions.resourcesName
 import com.jerry.request_core.utils.ResponseUtils
+import com.jerry.rt.core.http.pojo.s.IResponse
 
 @ConfigRegister(-1, registerClass = Any::class)
 class DefaultResourcesDispatcherConfigRegister : IConfig() {
@@ -32,7 +33,7 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
 
 
 
-    override fun onRequest(context: Context, request: Request, response: Response): Boolean {
+    override fun onRequest(context: Context, request: Request, response: IResponse): Boolean {
         val requestURI = request.getPackage().getRequestURI()
         if (requestURI.isResources()){
             if (resourcesDispatchers.isNotEmpty()){
@@ -48,7 +49,7 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
         return true
     }
 
-    private fun dealDefault(context: Context,request: Request,response: Response,resourcesPath:String){
+    private fun dealDefault(context: Context,request: Request,response: IResponse,resourcesPath:String){
         fun path():String{
             if (resourcesPath=="favicon.ico"){
                 return FileType.RAW.content + R.raw.favicon
@@ -74,7 +75,7 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
             this.resourcesDispatcher = requestHandler
         }
 
-        internal fun dealResources(context: Context,request: Request,response: Response):Boolean{
+        internal fun dealResources(context: Context,request: Request,response: IResponse):Boolean{
             val requestURI = request.getPackage().getRequestURI()
             val path = requestURI.path?:""
             val responsePath = requestURI.resourcesName()
@@ -89,6 +90,6 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
     }
 
     interface ResourcesDispatcher{
-        fun onResourcesRequest(context: Context,request: Request,response: Response,resourcesPath:String):String
+        fun onResourcesRequest(context: Context,request: Request,response: IResponse,resourcesPath:String):String
     }
 }

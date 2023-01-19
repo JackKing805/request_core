@@ -12,6 +12,8 @@ import com.jerry.request_core.extensions.IsIConfigResult
 import com.jerry.request_core.extensions.isIConfig
 import com.jerry.request_core.additation.DefaultAuthConfigRegister
 import com.jerry.request_core.additation.DefaultResourcesDispatcherConfigRegister
+import com.jerry.request_core.additation.DefaultRtConfigRegister
+import com.jerry.rt.core.http.pojo.s.IResponse
 import java.lang.reflect.Method
 
 
@@ -26,6 +28,7 @@ internal object RequestFactory {
     private val defaultInjects = mutableListOf<Class<*>>(
         DefaultAuthConfigRegister::class.java,
         DefaultResourcesDispatcherConfigRegister::class.java,
+        DefaultRtConfigRegister::class.java
     )
 
     fun init(injects:MutableList<Class<*>>){
@@ -99,7 +102,7 @@ internal object RequestFactory {
         }
     }
 
-    fun onRequest(context: Context,request: Request,response: Response):Boolean{
+    fun onRequest(context: Context,request: Request,response: IResponse):Boolean{
         configRegisterList.forEach {
             if (!it.instance.onRequest(context,request,response)){
                 return false
@@ -111,6 +114,8 @@ internal object RequestFactory {
     fun matchController(path:String): ControllerMapper?{
         return controllerMap[path]
     }
+
+    fun <T:IConfig> getConfigRegister(clazz: Class<T>) = configRegisterList.find { it.clazz == clazz }?.instance as? T
 }
 
 data class ConfigRegisterMapper(

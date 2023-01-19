@@ -4,21 +4,21 @@ import android.content.Context
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 import com.jerry.request_core.RequestUtils
+import com.jerry.request_core.additation.DefaultRtConfigRegister
 import com.jerry.request_core.bean.ParameterBean
 import com.jerry.request_core.factory.RequestFactory
 import com.jerry.request_core.extensions.parameterToArray
 import com.jerry.request_core.extensions.toObject
 import com.jerry.request_core.utils.ResponseUtils
+import com.jerry.rt.core.http.Client
+import com.jerry.rt.core.http.pojo.RtResponse
+import com.jerry.rt.core.http.pojo.s.IResponse
 
 /**
  * 请求分发
  */
 internal object RequestDelegator {
-    fun init(controllers:MutableList<Class<*>>){
-        RequestFactory.init(controllers)
-    }
-
-    internal fun dispatcher(context: Context, request: Request, response: Response) {
+    internal fun dispatcher(context: Context, request: Request, response: IResponse) {
         val requestURI = request.getPackage().getRequestURI()
         RequestUtils.getIRequestListener()?.onRequest(requestURI.path?:"")
         if (!RequestFactory.onRequest(context, request,response)){
@@ -38,7 +38,13 @@ internal object RequestDelegator {
                             Request::class.java -> {
                                 p.add(request)
                             }
-                            Response::class.java -> {
+                            IResponse::class.java -> {
+                                p.add(response)
+                            }
+                            Response::class.java->{
+                                p.add(response)
+                            }
+                            RtResponse::class.java->{
                                 p.add(response)
                             }
                             ParameterBean::class.java -> {
@@ -76,6 +82,19 @@ internal object RequestDelegator {
             }
         }
         ResponseUtils.dispatcherError(context,request,response, 404)
+    }
+
+
+    internal fun onRtIn(context: Context,client:Client,response: RtResponse){
+        RequestFactory.getConfigRegister(DefaultRtConfigRegister::class.java)?.onRtIn(context,client,response)
+    }
+
+    internal fun onRtMessage(context: Context,request: Request,response: RtResponse){
+        dispatcher(context,request,response)
+    }
+
+    internal fun onRtOut(context: Context,client: Client,response: RtResponse){
+        RequestFactory.getConfigRegister(DefaultRtConfigRegister::class.java)?.onRtOut(context,client,response)
     }
 }
 

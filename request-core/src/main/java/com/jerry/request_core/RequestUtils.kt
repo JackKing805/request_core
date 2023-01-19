@@ -1,8 +1,10 @@
 package com.jerry.request_core
 
 import android.app.Application
+import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.config.Config
 import com.jerry.request_core.delegator.RequestDelegator
+import com.jerry.request_core.factory.RequestFactory
 import com.jerry.request_core.interfaces.IRequestListener
 import com.jerry.request_core.service.ServerService
 
@@ -14,7 +16,7 @@ object RequestUtils {
     fun init(application: Application, config: Config, controllers:MutableList<Class<*>>){
         RequestUtils.application = application
         RequestUtils.config = config
-        RequestDelegator.init(controllers)
+        RequestFactory.init(controllers)
     }
 
     fun startServer(){
@@ -28,6 +30,8 @@ object RequestUtils {
     fun listen(iRequestListener: IRequestListener){
         RequestUtils.iRequestListener = iRequestListener
     }
+
+    fun <T: IConfig> getConfigRegister(clazz: Class<T>) = RequestFactory.getConfigRegister(clazz)
 
     internal fun getIRequestListener() = iRequestListener
 

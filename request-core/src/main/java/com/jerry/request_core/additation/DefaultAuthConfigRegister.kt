@@ -6,6 +6,7 @@ import com.jerry.request_base.annotations.Configuration
 import com.jerry.request_base.interfaces.IConfig
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
+import com.jerry.rt.core.http.pojo.s.IResponse
 
 @ConfigRegister(registerClass = Any::class)
 class DefaultAuthConfigRegister : IConfig() {
@@ -26,7 +27,7 @@ class DefaultAuthConfigRegister : IConfig() {
         }
     }
 
-    override fun onRequest(context: Context, request: Request, response: Response): Boolean {
+    override fun onRequest(context: Context, request: Request, response: IResponse): Boolean {
         requestInterceptorList.forEach {
             val pass = it.hand(context, request, response)
             if (!pass){
@@ -53,7 +54,7 @@ class DefaultAuthConfigRegister : IConfig() {
             this.requestHandler = requestHandler
         }
 
-        internal fun hand(context: Context,request: Request,response: Response):Boolean{
+        internal fun hand(context: Context,request: Request,response: IResponse):Boolean{
             val requestURI = request.getPackage().getRequestURI()
             val path = requestURI.path?:""
             interceptor.filter {
@@ -69,6 +70,6 @@ class DefaultAuthConfigRegister : IConfig() {
     }
 
     interface IRequestHandler{
-        fun handle(context: Context,request: Request,response: Response):Boolean
+        fun handle(context: Context,request: Request,response: IResponse):Boolean
     }
 }

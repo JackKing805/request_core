@@ -68,7 +68,7 @@ internal class ServerService: Service() {
     }
 
     private fun startServer(){
-        RtCore.instance.run(RtConfig(), statusListener = object :RtCoreListener{
+        RtCore.instance.run(RequestUtils.getRtConfig(), statusListener = object :RtCoreListener{
             override fun onClientIn(client: Client) {
                 "onClientIn".log()
                 client.listen(object :ClientListener{

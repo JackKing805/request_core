@@ -27,7 +27,12 @@ class DefaultAuthConfigRegister : IConfig() {
         }
     }
 
-    override fun onRequest(context: Context, request: Request, response: IResponse): Boolean {
+    override fun onRequest(
+        context: Context,
+        request: Request,
+        response: IResponse,
+        controllerMapper: ControllerMapper?
+    ): Boolean {
         requestInterceptorList.forEach {
             val pass = it.hand(context, request, response)
             if (!pass){
@@ -36,7 +41,6 @@ class DefaultAuthConfigRegister : IConfig() {
         }
         return  true
     }
-
 
     class RequestInterceptor(
         private val interceptor:MutableList<String> = mutableListOf(),

@@ -31,9 +31,12 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
         }
     }
 
-
-
-    override fun onRequest(context: Context, request: Request, response: IResponse): Boolean {
+    override fun onRequest(
+        context: Context,
+        request: Request,
+        response: IResponse,
+        controllerMapper: ControllerMapper?
+    ): Boolean {
         val requestURI = request.getPackage().getRequestURI()
         if (requestURI.isResources()){
             if (resourcesDispatchers.isNotEmpty()){

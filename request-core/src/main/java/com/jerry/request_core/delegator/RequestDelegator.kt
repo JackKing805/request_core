@@ -20,11 +20,11 @@ import com.jerry.rt.core.http.pojo.s.IResponse
 internal object RequestDelegator {
     internal fun dispatcher(context: Context, request: Request, response: IResponse) {
         val requestURI = request.getPackage().getRequestURI()
+        val controllerMapper = RequestFactory.matchController(requestURI.path)
         RequestUtils.getIRequestListener()?.onRequest(requestURI.path?:"")
-        if (!RequestFactory.onRequest(context, request,response)){
+        if (!RequestFactory.onRequest(context, request,response,controllerMapper)){
             return
         }
-        val controllerMapper = RequestFactory.matchController(requestURI.path)
         if (controllerMapper != null) {
             if (controllerMapper.requestMethod.content.equals(request.getPackage().method, true)) {
                 val newInstance = controllerMapper.instance

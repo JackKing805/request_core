@@ -5,6 +5,7 @@ import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.annotations.Configuration
 import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.RequestUtils
+import com.jerry.request_core.config.Config
 import com.jerry.rt.bean.RtConfig
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.pojo.Request
@@ -23,6 +24,9 @@ class DefaultRtInitConfigRegister : IConfig() {
             if (parameters.isEmpty() && RtConfig::class.java.isAssignableFrom(it.returnType)){
                 val invoke = it.invoke(newInstance) as RtConfig
                 RequestUtils.setRtConfig(invoke)
+            }else if (parameters.isEmpty() && Config::class.java.isAssignableFrom(it.returnType)){
+                val invoke = it.invoke(newInstance) as Config
+                RequestUtils.setConfig(invoke)
             }
         }
     }

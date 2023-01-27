@@ -11,21 +11,26 @@ import com.jerry.rt.bean.RtConfig
 
 object RequestUtils {
     private lateinit var application: Application
-    private lateinit var config: Config
     private var iRequestListener: IRequestListener?=null
     private var rtConfig = RtConfig()
+    private var config = Config(R.raw.favicon)
 
-    fun init(application: Application, config: Config, controllers:MutableList<Class<*>>){
+    fun init(application: Application,  more:MutableList<Class<*>>){
         RequestUtils.application = application
-        RequestUtils.config = config
-        RequestFactory.init(controllers)
+        inject(more)
+    }
+
+    fun inject(more:MutableList<Class<*>>){
+        RequestFactory.init(more)
     }
 
     fun setRtConfig(rtConfig: RtConfig){
         this.rtConfig = rtConfig
     }
 
-    fun getRtConfig() = rtConfig
+    fun setConfig(config: Config){
+        this.config = config
+    }
 
     fun startServer(){
         ServerService.run(application,true)
@@ -41,9 +46,11 @@ object RequestUtils {
 
     fun <T: IConfig> getConfigRegister(clazz: Class<T>) = RequestFactory.getConfigRegister(clazz)
 
-    internal fun getIRequestListener() = iRequestListener
+    fun getRtConfig() = rtConfig
 
-    internal fun getConfig() = config
+    fun getConfig() = config
+
+    internal fun getIRequestListener() = iRequestListener
 
     internal fun  getApplication() = application
 }

@@ -1,6 +1,7 @@
 package com.jerry.request_core.extensions
 
 import com.blankj.utilcode.util.GsonUtils
+import com.jerry.request_base.annotations.Bean
 import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.interfaces.IConfig
 import com.jerry.rt.core.http.protocol.RtMimeType
@@ -128,16 +129,16 @@ fun URI.matchUrlPath(localRegisterPath:String):Boolean{
     return path==localRegisterPath
 }
 
-fun String?.parameterToArray():Map<String,String>{
+fun URI?.parameterToArray():Map<String,String>{
     return if (this == null){
         emptyMap()
     }else{
         val map = mutableMapOf<String,String>()
-        this.split("&").forEach {
+        this.query.split("&").forEach {
             val split = it.split("=")
             map[split[0]] = split[1]
         }
-        map.toMap()
+        map
     }
 }
 
@@ -161,20 +162,3 @@ fun URI.resourcesName():String{
         }
     }
 }
-
-
-fun Class<*>.isIConfig(): IsIConfigResult {
-    val annotation = this.getAnnotation(ConfigRegister::class.java)
-    val isIConfig = IConfig::class.java.isAssignableFrom(this)
-    return if (annotation!=null && isIConfig){
-        IsIConfigResult.Is(annotation, this.newInstance() as IConfig)
-    }else{
-        IsIConfigResult.No
-    }
-}
-
-sealed class IsIConfigResult{
-    data class Is(val annotation: ConfigRegister,val instance:IConfig): IsIConfigResult()
-    object No: IsIConfigResult()
-}
-

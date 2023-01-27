@@ -11,18 +11,18 @@ import com.jerry.rt.core.http.pojo.Response
 import com.jerry.request_core.extensions.isResources
 import com.jerry.request_core.extensions.resourcesName
 import com.jerry.request_core.utils.ResponseUtils
+import com.jerry.request_core.utils.reflect.InvokeUtils
 import com.jerry.rt.core.http.pojo.s.IResponse
 
 @ConfigRegister(-1, registerClass = Any::class)
 class DefaultResourcesDispatcherConfigRegister : IConfig() {
     private  val resourcesDispatchers: MutableList<ResourcesDeal> = mutableListOf()
-    override fun init(annotation: Configuration, clazz: Class<*>) {
-        val newInstance = clazz.newInstance()
-        clazz.methods.forEach {
+    override fun init(annotation: Configuration, clazz:Any) {
+        clazz::class.java.methods.forEach {
             val parameters = it.parameters
             if (parameters.size==1 && ResourcesDeal::class.java.isAssignableFrom(parameters[0].type)){
                 val resourcesDispatcher = ResourcesDeal()
-                it.invoke(newInstance,resourcesDispatcher)
+                InvokeUtils.invokeMethod(clazz,it, arrayOf(resourcesDispatcher))
                 if (!resourcesDispatcher.isBuild()){
                     throw IllegalStateException("please add resources handler")
                 }

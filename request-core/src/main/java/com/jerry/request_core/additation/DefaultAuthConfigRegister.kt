@@ -4,6 +4,7 @@ import android.content.Context
 import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.annotations.Configuration
 import com.jerry.request_base.interfaces.IConfig
+import com.jerry.request_core.utils.reflect.InvokeUtils
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.core.http.pojo.s.IResponse
@@ -12,13 +13,12 @@ import com.jerry.rt.core.http.pojo.s.IResponse
 class DefaultAuthConfigRegister : IConfig() {
     private  val requestInterceptorList: MutableList<RequestInterceptor> = mutableListOf()
 
-    override fun init(annotation: Configuration, clazz: Class<*>) {
-        val newInstance = clazz.newInstance()
-        clazz.methods.forEach {
+    override fun init(annotation: Configuration, clazz: Any) {
+        clazz::class.java.methods.forEach {
             val parameters = it.parameters
             if (parameters.size==1 && RequestInterceptor::class.java.isAssignableFrom(parameters[0].type)){
                 val requestInterceptor = RequestInterceptor()
-                it.invoke(newInstance,requestInterceptor)
+                InvokeUtils.invokeMethod(clazz,it, arrayOf(requestInterceptor))
                 if (!requestInterceptor.isBuild()){
                     throw IllegalStateException("please add request handler")
                 }

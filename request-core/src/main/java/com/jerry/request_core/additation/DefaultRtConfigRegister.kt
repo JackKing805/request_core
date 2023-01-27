@@ -15,9 +15,9 @@ import kotlin.reflect.KClass
 class DefaultRtConfigRegister : IConfig() {
     private var rtClient:RtClient?=null
 
-    override fun init(annotation: Configuration, clazz: Class<*>) {
-        if (clazz.isAssignableFrom(RtClient::class.java)){
-            rtClient = clazz.newInstance() as RtClient
+    override fun init(annotation: Configuration, clazz: Any) {
+        if (clazz::class.java.isAssignableFrom(RtClient::class.java)){
+            rtClient = clazz as RtClient
         }
     }
 

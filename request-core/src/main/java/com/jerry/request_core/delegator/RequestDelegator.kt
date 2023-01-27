@@ -9,7 +9,9 @@ import com.jerry.request_core.bean.ParameterBean
 import com.jerry.request_core.factory.RequestFactory
 import com.jerry.request_core.extensions.parameterToArray
 import com.jerry.request_core.extensions.toObject
+import com.jerry.request_core.factory.InjectFactory
 import com.jerry.request_core.utils.ResponseUtils
+import com.jerry.request_core.utils.reflect.InvokeUtils
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.pojo.RtResponse
 import com.jerry.rt.core.http.pojo.s.IResponse
@@ -28,45 +30,41 @@ internal object RequestDelegator {
         if (controllerMapper != null) {
             if (controllerMapper.requestMethod.content.equals(request.getPackage().method, true)) {
                 val newInstance = controllerMapper.instance
-                val p = mutableListOf<Any?>()
                 try {
-                    controllerMapper.method.parameters.forEach {
-                        when (val clazz = it.type) {
-                            Context::class.java -> {
-                                p.add(context)
-                            }
-                            Request::class.java -> {
-                                p.add(request)
-                            }
-                            IResponse::class.java -> {
-                                p.add(response)
-                            }
-                            Response::class.java->{
-                                p.add(response)
-                            }
-                            RtResponse::class.java->{
-                                p.add(response)
-                            }
-                            ParameterBean::class.java -> {
-                                p.add(
+                    val invoke = try {
+                        InvokeUtils.invokeMethod(newInstance, controllerMapper.method){
+                            when (val clazz = it.type) {
+                                Context::class.java -> {
+                                    context
+                                }
+                                Request::class.java -> {
+                                    request
+                                }
+                                IResponse::class.java -> {
+                                    response
+                                }
+                                Response::class.java->{
+                                    response
+                                }
+                                RtResponse::class.java->{
+                                    response
+                                }
+                                ParameterBean::class.java -> {
                                     ParameterBean(
                                         request.getPackage()
-                                            .getRequestURI().query.parameterToArray()
+                                            .getRequestURI().parameterToArray()
                                     )
-                                )
-                            }
-                            else -> {
-                                val objects = request.getBody().toObject(clazz)
-                                p.add(objects)
+                                }
+                                else -> {
+                                    val objects = request.getBody().toObject(clazz)
+                                    objects
+                                }
                             }
                         }
+                    }catch (e:NullPointerException){
+                        ResponseUtils.dispatcherError(context,request,response, 500)
+                        return
                     }
-                } catch (e: Exception) {
-                    ResponseUtils.dispatcherError(context,request,response, 500)
-                    return
-                }
-                try {
-                    val invoke = controllerMapper.method.invoke(newInstance, *p.toTypedArray())
                     if (invoke==null){
                         ResponseUtils.dispatcherError(context,request,response, 500)
                     }else{
@@ -86,7 +84,7 @@ internal object RequestDelegator {
 
 
     internal fun onRtIn(context: Context,client:Client,response: RtResponse){
-        RequestFactory.getConfigRegister(DefaultRtConfigRegister::class.java)?.onRtIn(context,client,response)
+        (InjectFactory.getBeanBy { it.bean is DefaultRtConfigRegister }?.bean as? DefaultRtConfigRegister)?.onRtIn(context, client, response)
     }
 
     internal fun onRtMessage(context: Context,request: Request,response: RtResponse){
@@ -94,7 +92,7 @@ internal object RequestDelegator {
     }
 
     internal fun onRtOut(context: Context,client: Client,response: RtResponse){
-        RequestFactory.getConfigRegister(DefaultRtConfigRegister::class.java)?.onRtOut(context,client,response)
+        (InjectFactory.getBeanBy { it.bean is DefaultRtConfigRegister }?.bean as? DefaultRtConfigRegister)?.onRtOut(context, client, response)
     }
 }
 

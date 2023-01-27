@@ -15,6 +15,7 @@ object RequestUtils {
     private var rtConfig = RtConfig()
     private var config = Config(R.raw.favicon)
 
+
     fun init(application: Application,  more:MutableList<Class<*>>){
         RequestUtils.application = application
         inject(more)
@@ -43,8 +44,6 @@ object RequestUtils {
     fun listen(iRequestListener: IRequestListener){
         RequestUtils.iRequestListener = iRequestListener
     }
-
-    fun <T: IConfig> getConfigRegister(clazz: Class<T>) = RequestFactory.getConfigRegister(clazz)
 
     fun getRtConfig() = rtConfig
 

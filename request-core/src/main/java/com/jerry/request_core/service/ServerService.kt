@@ -77,6 +77,7 @@ internal class ServerService: Service() {
                 client.listen(object :ClientListener{
                     override fun onException(exception: Exception) {
                         exception.printStackTrace()
+                        "onException:${exception.toString()}".log()
                     }
 
                     override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {

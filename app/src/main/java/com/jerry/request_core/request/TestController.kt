@@ -6,7 +6,7 @@ import com.jerry.request_base.annotations.Controller
 import com.jerry.request_base.annotations.Inject
 import com.jerry.rt.core.http.pojo.Request
 
-@Controller("/", isRest = true)
+@Controller("/")
 class TestController {
 
 

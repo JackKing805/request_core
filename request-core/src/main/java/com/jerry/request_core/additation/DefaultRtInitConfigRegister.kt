@@ -6,8 +6,10 @@ import com.jerry.request_base.annotations.Configuration
 import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.RequestUtils
 import com.jerry.request_core.config.Config
+import com.jerry.request_core.factory.InjectFactory
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.rt.bean.RtConfig
+import com.jerry.rt.bean.RtSessionConfig
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.s.IResponse
 
@@ -15,19 +17,19 @@ import com.jerry.rt.core.http.pojo.s.IResponse
 class DefaultRtInitConfigRegister : IConfig() {
 
     override fun init(annotation: Configuration, clazz: Any) {
-        clazz::class.java.methods.forEach {
-            val parameters = it.parameters
-            if (parameters.isEmpty() && RtConfig::class.java.isAssignableFrom(it.returnType)){
-                val invoke = InjectUtils.invokeMethod(clazz,it, arrayOf()) as? RtConfig
-                if (invoke!=null){
-                    RequestUtils.setRtConfig(invoke)
-                }
-            }else if (parameters.isEmpty() && Config::class.java.isAssignableFrom(it.returnType)){
-                val invoke = InjectUtils.invokeMethod(clazz,it, arrayOf()) as? Config
-                if (invoke!=null){
-                    RequestUtils.setConfig(invoke)
-                }
-            }
+        val bean1 = InjectFactory.getBeanClass(RtConfig::class.java)?.bean
+        if (bean1!=null){
+            RequestUtils.setRtConfig(bean1 as RtConfig)
+        }
+
+        val bean2 = InjectFactory.getBeanClass(RtSessionConfig::class.java)?.bean
+        if (bean2!=null){
+            RequestUtils.setRtConfig(RequestUtils.getRtConfig().copy(rtSessionConfig = bean2 as RtSessionConfig))
+        }
+
+        val bean3 = InjectFactory.getBeanClass(Config::class.java)?.bean
+        if (bean3!=null){
+            RequestUtils.setConfig(bean3 as Config)
         }
     }
 

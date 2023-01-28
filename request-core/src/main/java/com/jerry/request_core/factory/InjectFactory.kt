@@ -233,6 +233,10 @@ internal object InjectFactory {
             clazz.isAssignableFrom(it.bean::class.java)
         }
     }
+
+    fun getBeanClass(clazz: Class<*>) = getBeanBy {
+        clazz.isAssignableFrom(it.bean::class.java)
+    }
 }
 
 data class BeanMapper(

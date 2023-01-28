@@ -11,7 +11,7 @@ import com.jerry.request_core.extensions.parameterToArray
 import com.jerry.request_core.extensions.toObject
 import com.jerry.request_core.factory.InjectFactory
 import com.jerry.request_core.utils.ResponseUtils
-import com.jerry.request_core.utils.reflect.InvokeUtils
+import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.pojo.RtResponse
 import com.jerry.rt.core.http.pojo.s.IResponse
@@ -31,7 +31,7 @@ internal object RequestDelegator {
             if (controllerMapper.requestMethod.content.equals(request.getPackage().method, true)) {
                 try {
                     val invoke = try {
-                        InvokeUtils.invokeMethod(controllerMapper.instance, controllerMapper.method){
+                        InjectUtils.invokeMethod(controllerMapper.instance, controllerMapper.method){
                             when (val clazz = it.type) {
                                 Context::class.java -> {
                                     context

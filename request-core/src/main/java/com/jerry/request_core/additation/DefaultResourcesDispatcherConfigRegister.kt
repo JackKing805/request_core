@@ -7,11 +7,10 @@ import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.R
 import com.jerry.request_core.constants.FileType
 import com.jerry.rt.core.http.pojo.Request
-import com.jerry.rt.core.http.pojo.Response
 import com.jerry.request_core.extensions.isResources
 import com.jerry.request_core.extensions.resourcesName
 import com.jerry.request_core.utils.ResponseUtils
-import com.jerry.request_core.utils.reflect.InvokeUtils
+import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.rt.core.http.pojo.s.IResponse
 
 @ConfigRegister(-1, registerClass = Any::class)
@@ -22,7 +21,7 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
             val parameters = it.parameters
             if (parameters.size==1 && ResourcesDeal::class.java.isAssignableFrom(parameters[0].type)){
                 val resourcesDispatcher = ResourcesDeal()
-                InvokeUtils.invokeMethod(clazz,it, arrayOf(resourcesDispatcher))
+                InjectUtils.invokeMethod(clazz,it, arrayOf(resourcesDispatcher))
                 if (!resourcesDispatcher.isBuild()){
                     throw IllegalStateException("please add resources handler")
                 }

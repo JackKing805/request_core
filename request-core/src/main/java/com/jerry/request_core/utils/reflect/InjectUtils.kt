@@ -6,7 +6,7 @@ import java.lang.reflect.AnnotatedElement
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
 
-object InvokeUtils {
+object InjectUtils {
     @Throws(NullPointerException::class)
     fun invokeMethod(any: Any,method: Method,provider:Array<Any> = arrayOf()):Any?{
         val args = mutableListOf<Any>()

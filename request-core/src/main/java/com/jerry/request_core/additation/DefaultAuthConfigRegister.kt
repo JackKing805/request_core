@@ -4,9 +4,8 @@ import android.content.Context
 import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.annotations.Configuration
 import com.jerry.request_base.interfaces.IConfig
-import com.jerry.request_core.utils.reflect.InvokeUtils
+import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.rt.core.http.pojo.Request
-import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.core.http.pojo.s.IResponse
 
 @ConfigRegister(registerClass = Any::class)
@@ -18,7 +17,7 @@ class DefaultAuthConfigRegister : IConfig() {
             val parameters = it.parameters
             if (parameters.size==1 && RequestInterceptor::class.java.isAssignableFrom(parameters[0].type)){
                 val requestInterceptor = RequestInterceptor()
-                InvokeUtils.invokeMethod(clazz,it, arrayOf(requestInterceptor))
+                InjectUtils.invokeMethod(clazz,it, arrayOf(requestInterceptor))
                 if (!requestInterceptor.isBuild()){
                     throw IllegalStateException("please add request handler")
                 }

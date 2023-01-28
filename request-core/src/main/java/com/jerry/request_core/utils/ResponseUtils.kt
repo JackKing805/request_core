@@ -46,7 +46,7 @@ object ResponseUtils{
                         if(returnObject.startsWith("{")&& returnObject.endsWith("}")){
                             response.write(returnObject, RtContentType.JSON.content)
                         }else {
-                            response.write(returnObject, returnObject.getFileMimeType())
+                            response.write(returnObject, RtContentType.TEXT_PLAIN.content)
                         }
                     }else{
                         when(fileType.fileType){

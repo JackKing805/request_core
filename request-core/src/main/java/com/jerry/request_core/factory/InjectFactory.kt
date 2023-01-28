@@ -113,8 +113,8 @@ internal object InjectFactory {
     private fun initConfig() {
         val configurations = listContainsAnnotation(Configuration::class.java).map {
             ConfigurationMapper(
-                it,
-                ReflectUtils.getAnnotation(it::class.java, Configuration::class.java)
+                it.bean,
+                ReflectUtils.getAnnotation(it.bean::class.java, Configuration::class.java)
             )
         }
         val registers = getConfigRegisters()
@@ -202,18 +202,18 @@ internal object InjectFactory {
 
     fun getConfigRegisters() = listContainsBy {
         ReflectUtils.haveAnnotation(
-            it::class.java,
+            it.bean::class.java,
             ConfigRegister::class.java
-        ) && IConfig::class.java.isAssignableFrom(it::class.java)
+        ) && IConfig::class.java.isAssignableFrom(it.bean::class.java)
     }.map {
         ConfigRegisterMapper(
             it.bean as IConfig,
-            ReflectUtils.getAnnotation(it::class.java, ConfigRegister::class.java)
+            ReflectUtils.getAnnotation(it.bean::class.java, ConfigRegister::class.java)
         )
     }.sortedByDescending { it.annotation.priority }
 
     fun listContainsAnnotation(annotationClass: Class<out Annotation>) = listContainsBy {
-        ReflectUtils.haveAnnotation(it::class.java, annotationClass)
+        ReflectUtils.haveAnnotation(it.bean::class.java, annotationClass)
     }
 
     fun listContainsBy(condition: (BeanMapper) -> Boolean) = beans.filter { condition(it) }

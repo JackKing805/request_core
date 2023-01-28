@@ -9,6 +9,8 @@ import com.jerry.request_core.TestApp
 
 @Configuration
 class A {
+    @Bean
+    val context = TestApp.app
 
     @Bean()
     fun pC():Context{

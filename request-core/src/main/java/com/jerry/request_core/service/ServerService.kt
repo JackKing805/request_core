@@ -23,7 +23,6 @@ import com.jerry.request_core.delegator.RequestDelegator
 import com.jerry.request_core.extensions.log
 import com.jerry.rt.core.http.pojo.RtResponse
 import java.io.InputStream
-import java.lang.Exception
 
 internal class ServerService: Service() {
     companion object{
@@ -69,6 +68,10 @@ internal class ServerService: Service() {
 
     private fun startServer(){
         RtCore.instance.run(RequestUtils.getRtConfig(), statusListener = object :RtCoreListener{
+            override fun onRtCoreException(exception: Exception) {
+                exception.printStackTrace()
+            }
+
             override fun onClientIn(client: Client) {
                 "onClientIn".log()
                 client.listen(object :ClientListener{

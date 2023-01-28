@@ -29,10 +29,9 @@ internal object RequestDelegator {
         }
         if (controllerMapper != null) {
             if (controllerMapper.requestMethod.content.equals(request.getPackage().method, true)) {
-                val newInstance = controllerMapper.instance
                 try {
                     val invoke = try {
-                        InvokeUtils.invokeMethod(newInstance, controllerMapper.method){
+                        InvokeUtils.invokeMethod(controllerMapper.instance, controllerMapper.method){
                             when (val clazz = it.type) {
                                 Context::class.java -> {
                                     context
@@ -62,6 +61,7 @@ internal object RequestDelegator {
                             }
                         }
                     }catch (e:NullPointerException){
+                        e.printStackTrace()
                         ResponseUtils.dispatcherError(response, 500)
                         return
                     }
@@ -71,6 +71,7 @@ internal object RequestDelegator {
                         ResponseUtils.dispatcherReturn(controllerMapper.isRestController, response, invoke)
                     }
                 } catch (e: NullPointerException) {
+                    e.printStackTrace()
                     ResponseUtils.dispatcherError(response, 502)
                 }
                 return

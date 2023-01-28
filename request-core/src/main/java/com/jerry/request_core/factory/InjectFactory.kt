@@ -9,6 +9,7 @@ import com.jerry.request_core.additation.DefaultRtConfigRegister
 import com.jerry.request_core.additation.DefaultRtInitConfigRegister
 import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils.injectField
+import java.lang.reflect.AnnotatedElement
 import java.lang.reflect.Method
 
 /**
@@ -57,6 +58,7 @@ internal object InjectFactory {
         any::class.java.declaredFields.forEach {
             val bean = ReflectUtils.getAnnotation(it, Bean::class.java)
             if (bean != null) {
+                it.isAccessible = true
                 val r = it.get(any)
                 if (r != null) {
                     beans.add(BeanMapper(bean.name, r))
@@ -77,8 +79,7 @@ internal object InjectFactory {
                     val ps = it.parameters
                     val args = mutableListOf<Any>()
                     ps.forEach {
-                        val inject = ReflectUtils.getAnnotation(it, Inject::class.java)
-                        val beanI = getInjectBean(it.type,inject)?.bean
+                        val beanI = getBeanByInjectOrClass(it,it.type)?.bean
 
                         if (beanI != null) {
                             args.add(beanI)
@@ -87,7 +88,7 @@ internal object InjectFactory {
                                 methods.find { a -> it.type.isAssignableFrom(a.returnType) }
                             if (method != null) {
                                 initBeanMethod(any, arrayOf(method), aInvokeMethods)
-                                val beanI2 = getInjectBean(it.type,inject)?.bean
+                                val beanI2 = getBeanByInjectOrClass(it,it.type)?.bean
                                 if (beanI2 != null) {
                                     args.add(beanI2)
                                 } else {
@@ -180,13 +181,15 @@ internal object InjectFactory {
 
     private fun injectField(any:Any) {
         any::class.java.declaredFields.forEach {
-            val inject = ReflectUtils.getAnnotation(it, Inject::class.java)
-            if (inject!=null){
+            val haveInject = ReflectUtils.haveAnnotation(it, Inject::class.java)
+            if (haveInject){
                 it.isAccessible = true
                 if (it.isAccessible) {
-                    val bean = getInjectBean(it.type,inject)?.bean
+                    val bean = getBeanByInjectOrClass(it,it.type)?.bean
                     if (bean!=null){
                         it.set(any,bean)
+                    }else{
+                        throw NullPointerException("please provider bean:${it.type}")
                     }
                 }
             }
@@ -221,7 +224,9 @@ internal object InjectFactory {
     fun getBeanBy(condition: (BeanMapper) -> Boolean): BeanMapper? =
         listContainsBy(condition).firstOrNull()
 
-    fun getInjectBean(clazz: Class<*>,inject: Inject?=null) = getBeanBy {
+
+    fun getBeanByInjectOrClass(annotatedElement: AnnotatedElement,clazz: Class<*>) = getBeanBy {
+        val inject = ReflectUtils.getAnnotation(annotatedElement,Inject::class.java)
         if (inject!=null && inject.name.isNotEmpty() && it.beanName.isNotEmpty() ) {
             it.beanName == inject.name
         } else {

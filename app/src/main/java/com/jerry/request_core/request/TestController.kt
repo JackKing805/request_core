@@ -8,11 +8,10 @@ import com.jerry.rt.core.http.pojo.Request
 
 @Controller("/", isRest = true)
 class TestController {
-    @Inject
-    lateinit var b:B
+
 
     @Controller("/")
-    fun onRoot(request: Request,@Inject context: Context):String{
+    fun onRoot(request: Request,context: Context,@Inject b:B):String{
         Log.e("ADSAD","onRoot:${request.getPackage().getSession().getId()}")
         return b.name + context.cacheDir.name
     }

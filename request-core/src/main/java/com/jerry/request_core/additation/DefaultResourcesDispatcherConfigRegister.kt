@@ -59,7 +59,7 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
             }
             return FileType.ASSETS.content + resourcesPath
         }
-        ResponseUtils.dispatcherReturn(context,false,request,response,path())
+        ResponseUtils.dispatcherReturn(false,response,path())
     }
 
     class ResourcesDeal(
@@ -84,7 +84,7 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
             val responsePath = requestURI.resourcesName()
             if (path == url || path.startsWith(url)){
                 val resourcesPath = resourcesDispatcher!!.onResourcesRequest(context, request, response,responsePath)
-                ResponseUtils.dispatcherReturn(context,false,request,response,resourcesPath)
+                ResponseUtils.dispatcherReturn(false,response,resourcesPath)
                 return true
             }else{
                 return false

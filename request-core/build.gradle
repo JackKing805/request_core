@@ -11,6 +11,8 @@ android {
     defaultConfig {
         minSdk 26
         targetSdk 33
+
+        multiDexEnabled true
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -19,6 +21,8 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+
 }
 
 dependencies {
@@ -42,7 +46,7 @@ afterEvaluate {
                 from components.release
                 groupId = "com.jerry"
                 artifactId = "request-core"
-                version = "0.1.5"
+                version = "0.1.6"
             }
         }
     }

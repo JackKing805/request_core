@@ -62,24 +62,24 @@ internal object RequestDelegator {
                             }
                         }
                     }catch (e:NullPointerException){
-                        ResponseUtils.dispatcherError(context,request,response, 500)
+                        ResponseUtils.dispatcherError(response, 500)
                         return
                     }
                     if (invoke==null){
-                        ResponseUtils.dispatcherError(context,request,response, 500)
+                        ResponseUtils.dispatcherError(response, 500)
                     }else{
-                        ResponseUtils.dispatcherReturn(context, controllerMapper.isRestController,request, response, invoke)
+                        ResponseUtils.dispatcherReturn(controllerMapper.isRestController, response, invoke)
                     }
                 } catch (e: NullPointerException) {
-                    ResponseUtils.dispatcherError(context,request,response, 502)
+                    ResponseUtils.dispatcherError(response, 502)
                 }
                 return
             } else {
-                ResponseUtils.dispatcherError(context,request,response, 405)
+                ResponseUtils.dispatcherError(response, 405)
                 return
             }
         }
-        ResponseUtils.dispatcherError(context,request,response, 404)
+        ResponseUtils.dispatcherError(response, 404)
     }
 
 

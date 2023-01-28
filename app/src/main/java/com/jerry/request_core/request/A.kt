@@ -11,18 +11,6 @@ import com.jerry.request_core.config.Config
 
 @Configuration
 class A {
-    @Bean
-    val context = TestApp.app
-
-    @Bean()
-    fun pC():Context{
-        return TestApp.app
-    }
-
-
-//    @Bean
-//    fun getConfig():Config = Config(R.drawable.ic_launcher_foreground)
-
     @Bean()
     fun getFun(@Inject("fuckC") c:C):B{
         Log.e("ADSAD","getFun")

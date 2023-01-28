@@ -8,8 +8,6 @@ import com.jerry.rt.core.http.pojo.Request
 
 @Controller("/")
 class TestController {
-
-
     @Controller("/")
     fun onRoot(request: Request,context: Context,@Inject b:B):String{
         Log.e("ADSAD","onRoot:${request.getPackage().getSession().getId()}")

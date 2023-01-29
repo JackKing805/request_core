@@ -1,11 +1,13 @@
 package com.jerry.request_core
 
 import android.app.Application
+import android.os.Build.VERSION_CODES.P
 import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.config.Config
 import com.jerry.request_core.delegator.RequestDelegator
 import com.jerry.request_core.factory.RequestFactory
 import com.jerry.request_core.interfaces.IRequestListener
+import com.jerry.request_core.service.RtCoreService
 import com.jerry.request_core.service.ServerService
 import com.jerry.rt.bean.RtConfig
 
@@ -34,11 +36,19 @@ object RequestUtils {
     }
 
     fun startServer(){
-        ServerService.run(application,true)
+        if (config.showStatusService){
+            ServerService.run(application,true)
+        }else{
+            RtCoreService.startRtCore(application)
+        }
     }
 
     fun stopServer(){
-        ServerService.run(application,false)
+        if (config.showStatusService){
+            ServerService.run(application,false)
+        }else{
+            RtCoreService.stopRtCore()
+        }
     }
 
     fun listen(iRequestListener: IRequestListener){

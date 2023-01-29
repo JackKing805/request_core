@@ -5,6 +5,7 @@ import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.annotations.Configuration
 import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.utils.reflect.InjectUtils
+import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.s.IResponse
 
@@ -15,7 +16,7 @@ class DefaultAuthConfigRegister : IConfig() {
     override fun init(annotation: Configuration, clazz: Any) {
         clazz::class.java.methods.forEach {
             val parameters = it.parameters
-            if (parameters.size==1 && RequestInterceptor::class.java.isAssignableFrom(parameters[0].type)){
+            if (parameters.size==1 && ReflectUtils.isSameClass(RequestInterceptor::class.java,parameters[0].type)){
                 val requestInterceptor = RequestInterceptor()
                 InjectUtils.invokeMethod(clazz,it, arrayOf(requestInterceptor))
                 if (!requestInterceptor.isBuild()){

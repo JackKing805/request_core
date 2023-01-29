@@ -72,23 +72,22 @@ internal object InjectFactory {
         methods: Array<Method>,
         aInvokeMethods: MutableList<Method>
     ) {
-        methods.forEach {
+        methods.forEach { it ->
             if (!aInvokeMethods.contains(it)) {
                 val bean = ReflectUtils.getAnnotation(it, Bean::class.java)
                 if (bean != null) {
                     val ps = it.parameters
                     val args = mutableListOf<Any>()
                     ps.forEach {
-                        val beanI = getBeanByInjectOrClass(it,it.type)?.bean
+                        val beanI = getBeanByInjectOrClass(it,it.type)
 
                         if (beanI != null) {
                             args.add(beanI)
                         } else {
-                            val method =
-                                methods.find { a -> it.type.isAssignableFrom(a.returnType) }
+                            val method = methods.find { a -> ReflectUtils.isSameClass(it.type,a.returnType) }
                             if (method != null) {
                                 initBeanMethod(any, arrayOf(method), aInvokeMethods)
-                                val beanI2 = getBeanByInjectOrClass(it,it.type)?.bean
+                                val beanI2 = getBeanByInjectOrClass(it,it.type)
                                 if (beanI2 != null) {
                                     args.add(beanI2)
                                 } else {
@@ -122,7 +121,7 @@ internal object InjectFactory {
 
         configurations.forEach { o ->
             registers.forEach { i ->
-                if (i.annotation.registerClass.java.isAssignableFrom(o.instance::class.java)) {
+                if (ReflectUtils.isSameClass(i.annotation.registerClass.java,o.instance::class.java)) {
                     i.instance.init(o.annotation, o.instance)
                 }
             }
@@ -185,7 +184,7 @@ internal object InjectFactory {
             if (haveInject){
                 it.isAccessible = true
                 if (it.isAccessible) {
-                    val bean = getBeanByInjectOrClass(it,it.type)?.bean
+                    val bean = getBeanByInjectOrClass(it,it.type)
                     if (bean!=null){
                         it.set(any,bean)
                     }else{
@@ -207,7 +206,7 @@ internal object InjectFactory {
         ReflectUtils.haveAnnotation(
             it.bean::class.java,
             ConfigRegister::class.java
-        ) && IConfig::class.java.isAssignableFrom(it.bean::class.java)
+        ) && ReflectUtils.isSameClass(IConfig::class.java,it.bean::class.java)
     }.map {
         ConfigRegisterMapper(
             it.bean as IConfig,
@@ -224,18 +223,38 @@ internal object InjectFactory {
     fun getBeanBy(condition: (BeanMapper) -> Boolean): BeanMapper? =
         listContainsBy(condition).firstOrNull()
 
-
     fun getBeanByInjectOrClass(annotatedElement: AnnotatedElement,clazz: Class<*>) = getBeanBy {
         val inject = ReflectUtils.getAnnotation(annotatedElement,Inject::class.java)
         if (inject!=null && inject.name.isNotEmpty() && it.beanName.isNotEmpty() ) {
             it.beanName == inject.name
         } else {
-            clazz.isAssignableFrom(it.bean::class.java)
+            ReflectUtils.isSameClass(clazz,it.bean::class.java)
         }
+    }?.bean
+
+    fun getBean(clazz: Class<*>):Any?{
+        val list = listContainsBy {
+            ReflectUtils.isSameClass(clazz,it.bean::class.java)
+        }
+        if (list.isEmpty()){
+            return null
+        }
+        list.forEach {
+            if (it.bean::class.java==clazz){
+                return it.bean
+            }
+        }
+        return list.firstOrNull()
     }
 
-    fun getBeanClass(clazz: Class<*>) = getBeanBy {
-        clazz.isAssignableFrom(it.bean::class.java)
+    fun getBean(beanName: String):Any?{
+        return listContainsBy {
+            if (it.beanName.isNotEmpty()){
+                it.beanName == beanName
+            }else{
+                false
+            }
+        }.firstOrNull()
     }
 }
 

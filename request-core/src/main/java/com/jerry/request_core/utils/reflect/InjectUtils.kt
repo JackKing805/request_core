@@ -19,7 +19,7 @@ object InjectUtils {
                     it.type
                 )
             }else{
-                provider.find { a-> it.type.isAssignableFrom(a::class.java) }?:throw NullPointerException("please provider resources :${it.type}")
+                provider.find { a-> ReflectUtils.isSameClass(it.type,a::class.java) }?:throw NullPointerException("please provider resources :${it.type}")
             }
             args.add(injectBean)
         }
@@ -55,6 +55,6 @@ object InjectUtils {
         return InjectFactory.getBeanByInjectOrClass(
             any,
             clazz
-        )?.bean?:throw NullPointerException("please provider bean:${clazz}")
+        )?:throw NullPointerException("please provider bean:${clazz}")
     }
 }

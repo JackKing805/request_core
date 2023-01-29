@@ -6,10 +6,10 @@ package com.jerry.request_core.constants
  * @date: 1/9/23
  **/
 enum class FileType(val content:String) {
-    SD_CARD("sd://"),
-    ASSETS("assets://"),
-    RAW("raw://"),
-    APP_FILE("file://");
+    SD_CARD("sd://"),//example: sd://path
+    ASSETS("assets://"),//example: assets://path
+    RAW("raw://"),//example: raw://id
+    APP_FILE("file://");//example: file://path
 
     companion object{
         fun matchFileType(str:String): ResultFileType?{

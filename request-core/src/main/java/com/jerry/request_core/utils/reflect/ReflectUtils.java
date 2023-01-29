@@ -30,28 +30,23 @@ public class ReflectUtils {
      */
     @Deprecated()
     public static boolean isBasicTypesObject(Class<?> clazz) {
-        if (
-                clazz.isArray() ||
-                        clazz.isInterface() ||
-                        clazz.isEnum() ||
-                        clazz==(Number.class) ||
-                        clazz==(String.class) ||
-                        clazz==(Integer.class) ||
-                        clazz==(int.class) ||
-                        clazz==(Boolean.class) ||
-                        clazz==(boolean.class) ||
-                        clazz==(Double.class) ||
-                        clazz==(double.class) ||
-                        clazz==(Float.class) ||
-                        clazz==(float.class) ||
-                        clazz==(Long.class) ||
-                        clazz==(long.class) ||
-                        clazz==(byte.class) ||
-                        clazz==(short.class)
-        ) {
-            return true;
-        }
-        return false;
+        return clazz.isArray() ||
+                clazz.isInterface() ||
+                clazz.isEnum() ||
+                clazz == (Number.class) ||
+                clazz == (String.class) ||
+                clazz == (Integer.class) ||
+                clazz == (int.class) ||
+                clazz == (Boolean.class) ||
+                clazz == (boolean.class) ||
+                clazz == (Double.class) ||
+                clazz == (double.class) ||
+                clazz == (Float.class) ||
+                clazz == (float.class) ||
+                clazz == (Long.class) ||
+                clazz == (long.class) ||
+                clazz == (byte.class) ||
+                clazz == (short.class);
     }
 
     public static Object invokeMethod(Object clazz, Method method,Object...objects) throws InvocationTargetException, IllegalAccessException {
@@ -68,6 +63,14 @@ public class ReflectUtils {
         if(!isHidden){
             field.setAccessible(false);
         }
+    }
+
+    public static boolean isSameClass(Class<?> parent,Class<?> child){
+        return parent.isAssignableFrom(child);
+    }
+
+    public static boolean isSameClass(Object parent,Object child){
+        return isSameClass(parent.getClass(),child.getClass());
     }
 }
 

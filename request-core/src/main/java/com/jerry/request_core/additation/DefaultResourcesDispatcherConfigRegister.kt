@@ -11,6 +11,7 @@ import com.jerry.request_core.extensions.isResources
 import com.jerry.request_core.extensions.resourcesName
 import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
+import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.rt.core.http.pojo.s.IResponse
 
 @ConfigRegister(-1, registerClass = Any::class)
@@ -19,7 +20,7 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
     override fun init(annotation: Configuration, clazz:Any) {
         clazz::class.java.methods.forEach {
             val parameters = it.parameters
-            if (parameters.size==1 && ResourcesDeal::class.java.isAssignableFrom(parameters[0].type)){
+            if (parameters.size==1 && ReflectUtils.isSameClass(ResourcesDeal::class.java,parameters[0].type)){
                 val resourcesDispatcher = ResourcesDeal()
                 InjectUtils.invokeMethod(clazz,it, arrayOf(resourcesDispatcher))
                 if (!resourcesDispatcher.isBuild()){

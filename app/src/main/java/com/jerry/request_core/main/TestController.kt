@@ -1,4 +1,4 @@
-package com.jerry.request_core.request
+package com.jerry.request_core.main
 
 import android.content.Context
 import android.util.Log
@@ -10,7 +10,7 @@ import com.jerry.rt.core.http.pojo.Request
 class TestController {
     @Controller("/")
     @kotlin.jvm.Throws(NullPointerException::class)
-    fun onRoot(request: Request,context: Context,@Inject b:B):String{
+    fun onRoot(request: Request,context: Context,@Inject b: B):String{
         Log.e("ADSAD","onRoot:${request.getPackage().getSession().getId()}")
         throw NullPointerException("haha")
         return b.name + context.cacheDir.name
@@ -18,7 +18,7 @@ class TestController {
 
     @Controller("/2")
     @kotlin.jvm.Throws(NullPointerException::class)
-    fun onRoot2(request: Request,context: Context,@Inject b:B):String{
+    fun onRoot2(request: Request,context: Context,@Inject b: B):String{
         Log.e("ADSAD","onRoot2:${request.getPackage().getSession().getId()}")
         throw IllegalArgumentException("haha")
         return b.name + context.cacheDir.name

@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.jerry.request_core'
+    namespace 'com.jerry.request_core.main'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.jerry.request_core"
+        applicationId "com.jerry.request_core.main"
         minSdk 26
         targetSdk 33
         versionCode 1

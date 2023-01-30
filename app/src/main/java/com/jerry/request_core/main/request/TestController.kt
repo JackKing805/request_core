@@ -1,9 +1,10 @@
-package com.jerry.request_core.main
+package com.jerry.request_core.main.request
 
 import android.content.Context
 import android.util.Log
 import com.jerry.request_base.annotations.Controller
 import com.jerry.request_base.annotations.Inject
+import com.jerry.request_core.main.request.B
 import com.jerry.rt.core.http.pojo.Request
 
 @Controller("/")

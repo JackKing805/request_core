@@ -1,14 +1,14 @@
-package com.jerry.request_core.main
+package com.jerry.request_core.main.request
 
 import android.content.Context
 import android.util.Log
 import com.jerry.request_base.annotations.Bean
 import com.jerry.request_base.annotations.Configuration
 import com.jerry.request_base.annotations.Inject
-import com.jerry.request_core.R
 import com.jerry.request_core.additation.DefaultResourcesDispatcherConfigRegister
 import com.jerry.request_core.config.Config
 import com.jerry.request_core.constants.FileType
+import com.jerry.request_core.main.R
 import com.jerry.rt.bean.RtConfig
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.s.IResponse

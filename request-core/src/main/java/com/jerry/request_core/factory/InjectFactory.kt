@@ -244,7 +244,7 @@ internal object InjectFactory {
                 return it.bean
             }
         }
-        return list.firstOrNull()
+        return list.firstOrNull()?.bean
     }
 
     fun getBean(beanName: String):Any?{
@@ -254,7 +254,13 @@ internal object InjectFactory {
             }else{
                 false
             }
-        }.firstOrNull()
+        }.firstOrNull()?.bean
+    }
+
+    fun <T : Annotation> getAnnotationBean(annotationClass:Class<T>):Any?{
+        return getBeanBy {
+            ReflectUtils.haveAnnotation(it.bean::class.java,annotationClass)
+        }?.bean
     }
 }
 

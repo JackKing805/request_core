@@ -1,13 +1,14 @@
 package com.jerry.request_core.utils.reflect
 
 import com.jerry.request_base.annotations.Inject
+import com.jerry.request_core.exception.InvokeMethodException
 import com.jerry.request_core.factory.InjectFactory
 import java.lang.reflect.AnnotatedElement
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
 
 object InjectUtils {
-    @Throws(NullPointerException::class)
+    @Throws(Exception::class)
     fun invokeMethod(any: Any,method: Method,provider:Array<Any> = arrayOf()):Any?{
         val args = mutableListOf<Any>()
         val parameters = method.parameters
@@ -19,15 +20,19 @@ object InjectUtils {
                     it.type
                 )
             }else{
-                provider.find { a-> ReflectUtils.isSameClass(it.type,a::class.java) }?:throw NullPointerException("please provider resources :${it.type}")
+                provider.find { a-> ReflectUtils.isSameClass(it.type,a::class.java) }?:throw InvokeMethodException("please provider resources :${it.type}")
             }
             args.add(injectBean)
         }
-        return method.invoke(any,*args.toTypedArray())
+        return try {
+            method.invoke(any,*args.toTypedArray())
+        }catch (e:Exception){
+            throw e
+        }
     }
 
 
-    @Throws(NullPointerException::class)
+    @Throws(Exception::class)
     fun invokeMethod(any: Any,method: Method,provider:(pa:Parameter)->Any?):Any?{
         val args = mutableListOf<Any>()
         val parameters = method.parameters
@@ -39,22 +44,26 @@ object InjectUtils {
                     it.type
                 )
             }else{
-                provider(it)?:throw NullPointerException("please provider resources :${it.type}")
+                provider(it)?:throw InvokeMethodException("please provider resources :${it.type}")
             }
             args.add(injectBean)
         }
-        return method.invoke(any,*args.toTypedArray())
+        return try {
+            method.invoke(any,*args.toTypedArray())
+        }catch (e:Exception){
+            throw e
+        }
     }
 
     private fun getInjectBean(any: AnnotatedElement,clazz: Class<*>):Any{
         val inject = ReflectUtils.haveAnnotation(any,Inject::class.java)
         if (!inject){
-            throw NullPointerException("please use inject annotation to find bean in bean factory")
+            throw InvokeMethodException("please use inject annotation to find bean in bean factory")
         }
 
         return InjectFactory.getBeanByInjectOrClass(
             any,
             clazz
-        )?:throw NullPointerException("please provider bean:${clazz}")
+        )?:throw InvokeMethodException("please provider bean:${clazz}")
     }
 }

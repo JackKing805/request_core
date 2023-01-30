@@ -66,4 +66,6 @@ object Core {
     fun getBean(clazz: Class<*>) = InjectFactory.getBean(clazz)
 
     fun getBean(beanName: String) = InjectFactory.getBean(beanName)
+
+    fun <T : Annotation> getAnnotationBean(annotationClass:Class<T>) = InjectFactory.getAnnotationBean(annotationClass)
 }

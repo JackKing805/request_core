@@ -1,7 +1,6 @@
 package com.jerry.request_core
 
 import android.app.Application
-import com.jerry.request_core.RequestUtils
 import com.jerry.request_core.request.A
 import com.jerry.request_core.request.TestController
 
@@ -16,6 +15,6 @@ class TestApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        RequestUtils.init(this, mutableListOf(A::class.java,TestController::class.java))
+        Core.init(this, mutableListOf(A::class.java,TestController::class.java))
     }
 }

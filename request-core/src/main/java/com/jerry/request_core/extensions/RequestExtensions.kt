@@ -1,11 +1,8 @@
 package com.jerry.request_core.extensions
 
 import com.blankj.utilcode.util.GsonUtils
-import com.jerry.request_base.annotations.Bean
-import com.jerry.request_base.annotations.ConfigRegister
-import com.jerry.request_base.interfaces.IConfig
 import com.jerry.rt.core.http.protocol.RtMimeType
-import com.jerry.request_core.RequestUtils
+import com.jerry.request_core.Core
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -15,7 +12,7 @@ import java.net.URL
 fun String.fromAssets(): String {
     val stringBuilder = StringBuilder()
     try {
-        BufferedReader(InputStreamReader(RequestUtils.getApplication().assets.open(this))).use {
+        BufferedReader(InputStreamReader(Core.getApplication().assets.open(this))).use {
             var line = ""
             while (it.readLine().also { r-> r?.let {
                     line = it
@@ -32,7 +29,7 @@ fun String.fromAssets(): String {
 
 
 fun String.byteArrayFromAssets(): ByteArray? {
-    val open = RequestUtils.getApplication().assets.open(this)
+    val open = Core.getApplication().assets.open(this)
     val readBytes = try {
         open.readBytes()
     }catch (e:Exception){
@@ -48,7 +45,7 @@ fun String.byteArrayFromAssets(): ByteArray? {
 }
 
 fun String.byteArrayFromAppFile(): ByteArray? {
-    val file = File( RequestUtils.getApplication().filesDir,this)
+    val file = File( Core.getApplication().filesDir,this)
     val inputStream = file.inputStream()
     val readBytes = try {
         inputStream.readBytes()
@@ -81,7 +78,7 @@ fun String.byteArrayFromSdCard(): ByteArray? {
 }
 
 fun Int.byteArrayFromRaw(): ByteArray? {
-    val inputStream = RequestUtils.getApplication().resources.openRawResource(this)
+    val inputStream = Core.getApplication().resources.openRawResource(this)
     val readBytes = try {
         inputStream.readBytes()
     }catch (e:Exception){

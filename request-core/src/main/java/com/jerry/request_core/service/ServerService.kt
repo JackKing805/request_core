@@ -10,19 +10,8 @@ import android.graphics.BitmapFactory
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.jerry.rt.bean.RtConfig
-import com.jerry.rt.core.RtCore
-import com.jerry.rt.core.http.Client
-import com.jerry.rt.core.http.interfaces.ClientListener
-import com.jerry.rt.core.http.pojo.Request
-import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.interfaces.RtCoreListener
-import com.jerry.request_core.RequestUtils
-import com.jerry.request_core.constants.Status
-import com.jerry.request_core.delegator.RequestDelegator
-import com.jerry.request_core.extensions.log
-import com.jerry.rt.core.http.pojo.RtResponse
-import java.io.InputStream
+import com.jerry.request_core.Core
 
 internal class ServerService: Service() {
     companion object{
@@ -74,7 +63,7 @@ internal class ServerService: Service() {
         channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         manager.createNotificationChannel(channel)
 
-        val config = RequestUtils.getConfig()
+        val config = Core.getConfig()
         val notification = NotificationCompat.Builder(this,"Server")
             .setSmallIcon(config.appIcon)
             .setLargeIcon(BitmapFactory.decodeResource(resources,config.appIcon))

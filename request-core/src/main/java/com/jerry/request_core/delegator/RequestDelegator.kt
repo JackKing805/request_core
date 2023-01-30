@@ -3,7 +3,7 @@ package com.jerry.request_core.delegator
 import android.content.Context
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
-import com.jerry.request_core.RequestUtils
+import com.jerry.request_core.Core
 import com.jerry.request_core.additation.DefaultRtConfigRegister
 import com.jerry.request_core.bean.ParameterBean
 import com.jerry.request_core.factory.RequestFactory
@@ -23,7 +23,7 @@ internal object RequestDelegator {
     internal fun dispatcher(context: Context, request: Request, response: IResponse) {
         val requestURI = request.getPackage().getRequestURI()
         val controllerMapper = RequestFactory.matchController(requestURI.path)
-        RequestUtils.getIRequestListener()?.onRequest(requestURI.path?:"")
+        Core.getIRequestListener()?.onRequest(requestURI.path?:"")
         if (!RequestFactory.onRequest(context, request,response,controllerMapper)){
             return
         }

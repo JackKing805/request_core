@@ -258,22 +258,22 @@ internal object InjectFactory {
     }
 }
 
-data class BeanMapper(
+internal data class BeanMapper(
     val beanName: String,
     val bean: Any
 )
 
-data class ConfigRegisterMapper(
+internal data class ConfigRegisterMapper(
     val instance: IConfig,
     val annotation: ConfigRegister
 )
 
-data class ConfigurationMapper(
+internal data class ConfigurationMapper(
     val instance: Any,
     val annotation: Configuration
 )
 
-data class ControllerMapper(
+internal data class ControllerMapper(
     val instance: Any,
     val method: Method,
     val requestMethod: RequestMethod,

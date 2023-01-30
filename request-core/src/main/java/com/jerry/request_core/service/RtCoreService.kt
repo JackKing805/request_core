@@ -1,7 +1,7 @@
 package com.jerry.request_core.service
 
 import android.content.Context
-import com.jerry.request_core.RequestUtils
+import com.jerry.request_core.Core
 import com.jerry.request_core.constants.Status
 import com.jerry.request_core.delegator.RequestDelegator
 import com.jerry.request_core.extensions.log
@@ -14,13 +14,13 @@ import com.jerry.rt.core.http.pojo.RtResponse
 import com.jerry.rt.interfaces.RtCoreListener
 import java.io.InputStream
 
-object RtCoreService {
+internal object RtCoreService {
     private var defaultStatus:RtCoreListener.Status? = null
         set(value) {
             value?.let {
-                RequestUtils.getIRequestListener()?.onStatusChange(Status.rtStatusToStats(it))
+                Core.getIRequestListener()?.onStatusChange(Status.rtStatusToStats(it))
             }?:run {
-                RequestUtils.getIRequestListener()?.onStatusChange(Status.rtStatusToStats(null))
+                Core.getIRequestListener()?.onStatusChange(Status.rtStatusToStats(null))
             }
             onStatus?.invoke(value)
             field = value
@@ -31,7 +31,7 @@ object RtCoreService {
     fun startRtCore(context: Context,onStatus:((RtCoreListener.Status?)->Unit)?=null){
         this.onStatus = onStatus
 
-        RtCore.instance.run(RequestUtils.getRtConfig(), statusListener = object : RtCoreListener {
+        RtCore.instance.run(Core.getRtConfig(), statusListener = object : RtCoreListener {
             override fun onRtCoreException(exception: Exception) {
                 exception.printStackTrace()
             }

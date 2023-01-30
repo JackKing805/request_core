@@ -1,17 +1,16 @@
 package com.jerry.request_core
 
 import android.app.Application
-import android.os.Build.VERSION_CODES.P
-import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.config.Config
-import com.jerry.request_core.delegator.RequestDelegator
+import com.jerry.request_core.factory.InjectFactory
 import com.jerry.request_core.factory.RequestFactory
 import com.jerry.request_core.interfaces.IRequestListener
 import com.jerry.request_core.service.RtCoreService
 import com.jerry.request_core.service.ServerService
+import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.rt.bean.RtConfig
 
-object RequestUtils {
+object Core {
     private lateinit var application: Application
     private var iRequestListener: IRequestListener?=null
     private var rtConfig = RtConfig()
@@ -19,7 +18,7 @@ object RequestUtils {
 
 
     fun init(application: Application,  more:MutableList<Class<*>>){
-        RequestUtils.application = application
+        Core.application = application
         inject(more)
     }
 
@@ -52,7 +51,7 @@ object RequestUtils {
     }
 
     fun listen(iRequestListener: IRequestListener){
-        RequestUtils.iRequestListener = iRequestListener
+        Core.iRequestListener = iRequestListener
     }
 
     fun getRtConfig() = rtConfig
@@ -62,4 +61,9 @@ object RequestUtils {
     internal fun getIRequestListener() = iRequestListener
 
     internal fun  getApplication() = application
+
+
+    fun getBean(clazz: Class<*>) = InjectFactory.getBean(clazz)
+
+    fun getBean(beanName: String) = InjectFactory.getBean(beanName)
 }

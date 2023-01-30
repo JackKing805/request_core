@@ -152,6 +152,7 @@ internal object RequestDelegator {
                 }
             }
         }
+        ResponseUtils.dispatcherError(response,500)
     }
 }
 

@@ -4,6 +4,7 @@ import android.content.Context
 import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.annotations.Configuration
 import com.jerry.request_base.interfaces.IConfig
+import com.jerry.request_core.Core
 import com.jerry.request_core.R
 import com.jerry.request_core.constants.FileType
 import com.jerry.rt.core.http.pojo.Request
@@ -16,8 +17,20 @@ import com.jerry.rt.core.http.pojo.s.IResponse
 
 @ConfigRegister(-1, registerClass = Any::class)
 class DefaultResourcesDispatcherConfigRegister : IConfig() {
+    private var isF = true
     private  val resourcesDispatchers: MutableList<ResourcesDeal> = mutableListOf()
     override fun init(annotation: Configuration, clazz:Any) {
+        if (isF){
+            isF = false
+            val bean = Core.getBean(ResourcesDeal::class.java)
+            if (bean!=null){
+                val ss = bean as ResourcesDeal
+                if (!resourcesDispatchers.contains(ss)){
+                    resourcesDispatchers.add(bean)
+                }
+            }
+
+        }
         clazz::class.java.methods.forEach {
             val parameters = it.parameters
             if (parameters.size==1 && ReflectUtils.isSameClass(ResourcesDeal::class.java,parameters[0].type)){

@@ -30,7 +30,7 @@ dependencies {
     //tools
     implementation 'com.blankj:utilcodex:1.31.1'
     //rt
-    implementation 'com.github.JackKing805:RtCore:0.2.6'
+    implementation 'com.github.JackKing805:RtCore:0.2.7'
     //base
     implementation 'com.github.JackKing805:request_base:0.0.8'
 
@@ -46,7 +46,7 @@ afterEvaluate {
                 from components.release
                 groupId = "com.jerry"
                 artifactId = "request-core"
-                version = "0.2.4"
+                version = "0.2.5"
             }
         }
     }

@@ -14,22 +14,26 @@ import com.jerry.rt.core.http.pojo.s.IResponse
 
 @ConfigRegister(registerClass = Any::class)
 class DefaultRtInitConfigRegister : IConfig() {
+    private var isF = true
 
     override fun init(annotation: Configuration, clazz: Any) {
-        val bean1 = InjectFactory.getBean(RtConfig::class.java)
-        if (bean1!=null){
-            Core.setRtConfig(bean1 as RtConfig)
-        }
+       if (isF){
+           isF = false
+           val bean1 = InjectFactory.getBean(RtConfig::class.java)
+           if (bean1!=null){
+               Core.setRtConfig(bean1 as RtConfig)
+           }
 
-        val bean2 = InjectFactory.getBean(RtSessionConfig::class.java)
-        if (bean2!=null){
-            Core.setRtConfig(Core.getRtConfig().copy(rtSessionConfig = bean2 as RtSessionConfig))
-        }
+           val bean2 = InjectFactory.getBean(RtSessionConfig::class.java)
+           if (bean2!=null){
+               Core.setRtConfig(Core.getRtConfig().copy(rtSessionConfig = bean2 as RtSessionConfig))
+           }
 
-        val bean3 = InjectFactory.getBean(Config::class.java)
-        if (bean3!=null){
-            Core.setConfig(bean3 as Config)
-        }
+           val bean3 = InjectFactory.getBean(Config::class.java)
+           if (bean3!=null){
+               Core.setConfig(bean3 as Config)
+           }
+       }
     }
 
     override fun onRequest(

@@ -11,7 +11,7 @@ import com.jerry.request_core.constants.FileType
 import com.jerry.request_core.main.R
 import com.jerry.rt.bean.RtConfig
 import com.jerry.rt.core.http.pojo.Request
-import com.jerry.rt.core.http.pojo.s.IResponse
+import com.jerry.rt.core.http.pojo.Response
 
 @Configuration
 class A {
@@ -19,7 +19,7 @@ class A {
     fun setConfig() = Config(appIcon = R.raw.a)
 
     @Bean
-    fun setRtConfig() = RtConfig(port = 8081)
+    fun setRtConfig() = RtConfig(port = 8080)
 
 
     fun customR(r:DefaultResourcesDispatcherConfigRegister.ResourcesDeal){
@@ -28,7 +28,7 @@ class A {
                 override fun onResourcesRequest(
                     context: Context,
                     request: Request,
-                    response: IResponse,
+                    response: Response,
                     resourcesPath: String
                 ): String {
                     return FileType.RAW.content + R.raw.a

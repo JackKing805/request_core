@@ -17,25 +17,20 @@ import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.rt.core.http.Client
-import com.jerry.rt.core.http.pojo.RtResponse
-import com.jerry.rt.core.http.pojo.s.IResponse
 import java.lang.reflect.InvocationTargetException
 
 /**
  * 请求分发
  */
 internal object RequestDelegator {
-    internal fun dispatcher(context: Context, request: Request, response: IResponse) {
+    internal fun dispatcher(context: Context, request: Request, response: Response) {
         val requestURI = request.getPackage().getRequestURI()
         val controllerMapper = RequestFactory.matchController(requestURI.path)
         Core.getIRequestListener()?.onRequest(requestURI.path?:"")
 
 
         try {
-            if (!RequestFactory.onRequest(context, request,response,controllerMapper)){
-                if (response is Response){
-                    ResponseUtils.dispatcherError(response,400)
-                }
+            if (!RequestFactory.onRequestPre(context, request,response,controllerMapper)){
                 return
             }
         }catch (e:Exception){
@@ -55,13 +50,7 @@ internal object RequestDelegator {
                                 Request::class.java -> {
                                     request
                                 }
-                                IResponse::class.java -> {
-                                    response
-                                }
                                 Response::class.java->{
-                                    response
-                                }
-                                RtResponse::class.java->{
                                     response
                                 }
                                 ParameterBean::class.java -> {
@@ -87,7 +76,9 @@ internal object RequestDelegator {
                     if (invoke==null){
                         ResponseUtils.dispatcherError(response, 500)
                     }else{
-                        ResponseUtils.dispatcherReturn(controllerMapper.isRestController, response, invoke)
+                        if (RequestFactory.onRequestEnd(context, request, response)){
+                            ResponseUtils.dispatcherReturn(controllerMapper.isRestController, response, invoke)
+                        }
                     }
                 } catch (e: NullPointerException) {
                     e.printStackTrace()
@@ -103,7 +94,7 @@ internal object RequestDelegator {
     }
 
 
-    internal fun onRtIn(context: Context,client:Client,response: RtResponse){
+    internal fun onRtIn(context: Context,client:Client,response: Response){
         try {
             (InjectFactory.getBeanBy { it.bean is DefaultRtConfigRegister }?.bean as? DefaultRtConfigRegister)?.onRtIn(context, client, response)
         }catch (e:Exception){
@@ -111,11 +102,11 @@ internal object RequestDelegator {
         }
     }
 
-    internal fun onRtMessage(context: Context,request: Request,response: RtResponse){
+    internal fun onRtMessage(context: Context,request: Request,response: Response){
         dispatcher(context,request,response)
     }
 
-    internal fun onRtOut(context: Context,client: Client,response: RtResponse){
+    internal fun onRtOut(context: Context,client: Client,response: Response){
         try {
             (InjectFactory.getBeanBy { it.bean is DefaultRtConfigRegister }?.bean as? DefaultRtConfigRegister)?.onRtOut(context, client, response)
         }catch (e:Exception){
@@ -124,7 +115,7 @@ internal object RequestDelegator {
     }
 
 
-    private fun onException(response: IResponse,e:Exception){
+    private fun onException(response: Response,e:Exception){
         val realException = if (e is InvocationTargetException){
             e.targetException
         }else{

@@ -119,6 +119,10 @@ internal object InjectFactory {
         }
         val registers = getConfigRegisters()
 
+        registers.forEach {
+            it.instance.onCreate()
+        }
+
         configurations.forEach { o ->
             registers.forEach { i ->
                 if (ReflectUtils.isSameClass(i.annotation.registerClass.java,o.instance::class.java)) {

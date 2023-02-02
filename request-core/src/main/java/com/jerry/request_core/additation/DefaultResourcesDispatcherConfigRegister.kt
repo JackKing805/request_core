@@ -3,6 +3,7 @@ package com.jerry.request_core.additation
 import android.content.Context
 import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.annotations.Configuration
+import com.jerry.request_base.bean.IConfigControllerMapper
 import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.Core
 import com.jerry.request_core.R
@@ -13,24 +14,12 @@ import com.jerry.request_core.extensions.resourcesName
 import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils
-import com.jerry.rt.core.http.pojo.s.IResponse
+import com.jerry.rt.core.http.pojo.Response
 
 @ConfigRegister(-1, registerClass = Any::class)
 class DefaultResourcesDispatcherConfigRegister : IConfig() {
-    private var isF = true
     private  val resourcesDispatchers: MutableList<ResourcesDeal> = mutableListOf()
     override fun init(annotation: Configuration, clazz:Any) {
-        if (isF){
-            isF = false
-            val bean = Core.getBean(ResourcesDeal::class.java)
-            if (bean!=null){
-                val ss = bean as ResourcesDeal
-                if (!resourcesDispatchers.contains(ss)){
-                    resourcesDispatchers.add(bean)
-                }
-            }
-
-        }
         clazz::class.java.methods.forEach {
             val parameters = it.parameters
             if (parameters.size==1 && ReflectUtils.isSameClass(ResourcesDeal::class.java,parameters[0].type)){
@@ -44,11 +33,25 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
         }
     }
 
-    override fun onRequest(
+    override fun onCreate() {
+        val bean = Core.getBean(ResourcesDeal::class.java)
+        if (bean!=null){
+            val ss = bean as ResourcesDeal
+            if (!resourcesDispatchers.contains(ss)){
+                resourcesDispatchers.add(bean)
+            }
+        }
+    }
+
+    override fun onRequestEnd(context: Context, request: Request, response: Response): Boolean {
+        return true
+    }
+
+    override fun onRequestPre(
         context: Context,
         request: Request,
-        response: IResponse,
-        controllerMapper: ControllerMapper?
+        response: Response,
+        IConfigControllerMapper: IConfigControllerMapper?
     ): Boolean {
         val requestURI = request.getPackage().getRequestURI()
         if (requestURI.isResources()){
@@ -65,7 +68,7 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
         return true
     }
 
-    private fun dealDefault(context: Context,request: Request,response: IResponse,resourcesPath:String){
+    private fun dealDefault(context: Context,request: Request,response: Response,resourcesPath:String){
         fun path():String{
             if (resourcesPath=="favicon.ico"){
                 return FileType.RAW.content + R.raw.favicon
@@ -91,7 +94,7 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
             this.resourcesDispatcher = requestHandler
         }
 
-        internal fun dealResources(context: Context,request: Request,response: IResponse):Boolean{
+        internal fun dealResources(context: Context,request: Request,response: Response):Boolean{
             val requestURI = request.getPackage().getRequestURI()
             val path = requestURI.path?:""
             val responsePath = requestURI.resourcesName()
@@ -106,6 +109,6 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
     }
 
     interface ResourcesDispatcher{
-        fun onResourcesRequest(context: Context,request: Request,response: IResponse,resourcesPath:String):String
+        fun onResourcesRequest(context: Context,request: Request,response: Response,resourcesPath:String):String
     }
 }

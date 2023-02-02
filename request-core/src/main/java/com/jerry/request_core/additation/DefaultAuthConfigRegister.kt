@@ -3,28 +3,20 @@ package com.jerry.request_core.additation
 import android.content.Context
 import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.annotations.Configuration
+import com.jerry.request_base.bean.IConfigControllerMapper
 import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.Core
+import com.jerry.request_core.factory.ControllerMapper
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.rt.core.http.pojo.Request
-import com.jerry.rt.core.http.pojo.s.IResponse
+import com.jerry.rt.core.http.pojo.Response
 
 @ConfigRegister(registerClass = Any::class)
 class DefaultAuthConfigRegister : IConfig() {
-    private var isF = true
     private  val requestInterceptorList: MutableList<RequestInterceptor> = mutableListOf()
 
     override fun init(annotation: Configuration, clazz: Any) {
-        if (isF){
-            isF = false
-            val bean = Core.getBean(RequestInterceptor::class.java)
-            if (bean!=null){
-                val ss = bean as RequestInterceptor
-                requestInterceptorList.add(bean)
-            }
-        }
-
         clazz::class.java.methods.forEach {
             val parameters = it.parameters
             if (parameters.size==1 && ReflectUtils.isSameClass(RequestInterceptor::class.java,parameters[0].type)){
@@ -38,11 +30,23 @@ class DefaultAuthConfigRegister : IConfig() {
         }
     }
 
-    override fun onRequest(
+    override fun onCreate() {
+        val bean = Core.getBean(RequestInterceptor::class.java)
+        if (bean!=null){
+            val ss = bean as RequestInterceptor
+            requestInterceptorList.add(bean)
+        }
+    }
+
+    override fun onRequestEnd(context: Context, request: Request, response: Response) :Boolean{
+        return true
+    }
+
+    override fun onRequestPre(
         context: Context,
         request: Request,
-        response: IResponse,
-        controllerMapper: ControllerMapper?
+        response: Response,
+        IConfigControllerMapper: IConfigControllerMapper?
     ): Boolean {
         requestInterceptorList.forEach {
             val pass = it.hand(context, request, response)
@@ -69,7 +73,7 @@ class DefaultAuthConfigRegister : IConfig() {
             this.requestHandler = requestHandler
         }
 
-        internal fun hand(context: Context,request: Request,response: IResponse):Boolean{
+        internal fun hand(context: Context,request: Request,response: Response):Boolean{
             val requestURI = request.getPackage().getRequestURI()
             val path = requestURI.path?:""
             interceptor.filter {
@@ -85,6 +89,6 @@ class DefaultAuthConfigRegister : IConfig() {
     }
 
     interface IRequestHandler{
-        fun handle(context: Context,request: Request,response: IResponse):Boolean
+        fun handle(context: Context,request: Request,response: Response):Boolean
     }
 }

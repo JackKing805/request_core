@@ -8,12 +8,14 @@ import com.jerry.request_core.anno.ExceptionRule
 class ExceptionHandler1 {
 
     @ExceptionHandler(NullPointerException::class)
-    fun onNull(e:NullPointerException){
+    fun onNull(e:NullPointerException):String{
         Log.e("ADSAD","onNull:$e")
+        return "onNull"
     }
 
     @ExceptionHandler(IllegalArgumentException::class)
-    fun onIll(e:IllegalArgumentException){
+    fun onIll(e:IllegalArgumentException):String{
         Log.e("ADSAD","onNull:$e")
+        return "onIll"
     }
 }

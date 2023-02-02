@@ -10,7 +10,6 @@ import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
-import com.jerry.rt.core.http.pojo.RtResponse
 import com.jerry.rt.interfaces.RtCoreListener
 import java.io.InputStream
 
@@ -57,20 +56,20 @@ internal object RtCoreService {
                         RequestDelegator.dispatcher(context,request,response)
                     }
 
-                    override fun onRtClientIn(client: Client, response: RtResponse) {
+                    override fun onRtClientIn(client: Client, response: Response) {
                         RequestDelegator.onRtIn(context,client,response)
                     }
 
-                    override fun onRtClientOut(client: Client, rtResponse: RtResponse) {
-                        RequestDelegator.onRtOut(context,client,rtResponse)
+                    override fun onRtClientOut(client: Client, response: Response) {
+                        RequestDelegator.onRtOut(context,client,response)
                     }
 
                     override suspend fun onRtHeartbeat(client: Client) {
 
                     }
 
-                    override suspend fun onRtMessage(request: Request, rtResponse: RtResponse) {
-                        RequestDelegator.onRtMessage(context,request,rtResponse)
+                    override suspend fun onRtMessage(request: Request, response: Response) {
+                        RequestDelegator.onRtMessage(context,request,response)
                     }
                 })
             }

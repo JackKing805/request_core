@@ -266,6 +266,20 @@ internal object InjectFactory {
             ReflectUtils.haveAnnotation(it.bean::class.java,annotationClass)
         }?.bean
     }
+
+    //手动移除bean
+    internal fun removeBean(bean: Any){
+        beans.removeAll {
+            it.bean == bean
+        }
+    }
+
+    //手动注入bean
+    internal fun insertBean(bean: Any){
+        if (beans.find { it.bean==bean }==null){
+            beans.add(BeanMapper(bean.javaClass.simpleName,bean))
+        }
+    }
 }
 
 internal data class BeanMapper(

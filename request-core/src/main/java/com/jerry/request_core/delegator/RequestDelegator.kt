@@ -16,8 +16,13 @@ import com.jerry.request_core.factory.InjectFactory
 import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils
+import com.jerry.rt.bean.RtConfig
+import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.Client
+import com.jerry.rt.core.http.interfaces.ISessionManager
 import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Method
+import kotlin.reflect.KClass
 
 /**
  * 请求分发
@@ -121,29 +126,77 @@ internal object RequestDelegator {
         }else{
             e
         }
-        val annotationBean = Core.getAnnotationBean(ExceptionRule::class.java)
-        if (annotationBean!=null){
-            annotationBean::class.java.declaredMethods.forEach { m->
-                val handlerAnno = ReflectUtils.getAnnotation(m,ExceptionHandler::class.java)
-                if (handlerAnno!=null){
-                    if (handlerAnno.exceptionClasses==realException::class){
-                        val invokeMethod = try {
-                            InjectUtils.invokeMethod(annotationBean, m, provider = arrayOf(realException))
-                        }catch (e:Exception){
-                            ResponseUtils.dispatcherError(response,500)
-                            return
-                        }
-                        if (invokeMethod!=null){
-                            ResponseUtils.dispatcherReturn(true,response,invokeMethod)
-                        }else{
-                            ResponseUtils.dispatcherError(response,500)
-                        }
-                        return
+
+        if (requestExceptionHandler==null){
+            val annotationBean = Core.getAnnotationBean(ExceptionRule::class.java)
+            if (annotationBean!=null){
+                requestExceptionHandler = RequestExceptionHandler(annotationBean)
+            }
+        }
+
+
+        if (requestExceptionHandler!=null){
+            if (requestExceptionHandler!!.dealException(response,realException)){
+                return
+            }
+        }
+        ResponseUtils.dispatcherError(response,500)
+    }
+
+    private var requestExceptionHandler:RequestExceptionHandler?=null
+
+
+    private class RequestExceptionHandler(private val ins:Any){
+        private class ExceptionMethod(
+            val method: Method,
+            val exceptionClass: KClass<out Throwable>
+        )
+
+        private val exceptionClasses = mutableListOf<ExceptionMethod>()
+
+        init {
+            val annotationBean = Core.getAnnotationBean(ExceptionRule::class.java)
+            if (annotationBean!=null){
+                annotationBean::class.java.declaredMethods.forEach { m->
+                    val handlerAnno = ReflectUtils.getAnnotation(m,ExceptionHandler::class.java)
+                    if (handlerAnno!=null){
+                        exceptionClasses.add(ExceptionMethod(m,handlerAnno.exceptionClasses))
                     }
                 }
             }
         }
-        ResponseUtils.dispatcherError(response,500)
+
+
+        fun dealException(response: Response,e:Throwable):Boolean{
+            val AllExce =exceptionClasses.find { it.exceptionClass==Exception::class }
+            if (AllExce!=null){
+                val invokeMethod = try {
+                    InjectUtils.invokeMethod(ins, AllExce.method, provider = arrayOf(e))
+                }catch (e:Exception){
+                    return false
+                }
+                if (invokeMethod!=null){
+                    ResponseUtils.dispatcherReturn(true,response,invokeMethod)
+                    return true
+                }
+            }else{
+                val exce =exceptionClasses.find { it.exceptionClass==e::class }
+                if (exce!=null){
+                    val invokeMethod = try {
+                        InjectUtils.invokeMethod(ins, exce.method, provider = arrayOf(e))
+                    }catch (e:Exception){
+                        return false
+                    }
+                    if (invokeMethod!=null){
+                        ResponseUtils.dispatcherReturn(true,response,invokeMethod)
+                        return true
+                    }
+                }
+            }
+            return false
+        }
+
+
     }
 }
 

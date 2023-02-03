@@ -5,6 +5,8 @@ import com.jerry.request_core.Core
 import com.jerry.request_core.constants.Status
 import com.jerry.request_core.delegator.RequestDelegator
 import com.jerry.request_core.extensions.log
+import com.jerry.request_core.factory.InjectFactory
+import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.RtCore
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
@@ -86,6 +88,16 @@ internal object RtCoreService {
                 if (defaultStatus==RtCoreListener.Status.STOPPED){
                     defaultStatus = null
                 }
+            }
+
+            override fun onCreateContext(rtContext: RtContext) {
+                InjectFactory.insertBean(rtContext)
+                InjectFactory.insertBean(rtContext.getSessionManager())
+            }
+
+            override fun onDestroyContext(rtContext: RtContext) {
+                InjectFactory.removeBean(rtContext.getSessionManager())
+                InjectFactory.removeBean(rtContext)
             }
         })
     }

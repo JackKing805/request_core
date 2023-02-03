@@ -8,6 +8,7 @@ import java.io.File
 import java.io.InputStreamReader
 import java.net.URI
 import java.net.URL
+import java.net.URLDecoder
 
 fun String.fromAssets(): String {
     val stringBuilder = StringBuilder()
@@ -131,9 +132,11 @@ fun URI?.parameterToArray():Map<String,String>{
         emptyMap()
     }else{
         val map = mutableMapOf<String,String>()
-        this.query.split("&").forEach {
-            val split = it.split("=")
-            map[split[0]] = split[1]
+        if (this.query!=null){
+            this.query.split("&").forEach {
+                val split = it.split("=")
+                map[split[0]] = URLDecoder.decode(split[1],"UTF-8")
+            }
         }
         map
     }

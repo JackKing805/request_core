@@ -168,6 +168,7 @@ internal object RequestDelegator {
 
 
         fun dealException(response: Response,e:Throwable):Boolean{
+            e.printStackTrace()
             val AllExce =exceptionClasses.find { it.exceptionClass==Exception::class }
             if (AllExce!=null){
                 val invokeMethod = try {

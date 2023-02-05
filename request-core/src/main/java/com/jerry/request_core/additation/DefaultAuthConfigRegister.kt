@@ -34,7 +34,7 @@ class DefaultAuthConfigRegister : IConfig() {
         val bean = Core.getBean(RequestInterceptor::class.java)
         if (bean!=null){
             val ss = bean as RequestInterceptor
-            requestInterceptorList.add(bean)
+            requestInterceptorList.add(ss)
         }
     }
 

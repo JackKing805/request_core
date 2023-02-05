@@ -120,10 +120,7 @@ internal object InjectFactory {
         val registers = getConfigRegisters()
 
         registers.forEach {
-            if (!it.isInit){
-                it.isInit = true
-                it.instance.onCreate()
-            }
+            it.instance.onCreate()
         }
 
         configurations.forEach { o ->
@@ -292,8 +289,7 @@ internal data class BeanMapper(
 
 internal data class ConfigRegisterMapper(
     val instance: IConfig,
-    val annotation: ConfigRegister,
-    var isInit:Boolean = false
+    val annotation: ConfigRegister
 )
 
 internal data class ConfigurationMapper(

@@ -13,15 +13,9 @@ import com.jerry.rt.core.http.pojo.Request
 
 @Controller("/")
 class TestController {
-    @Controller("/")
-    fun onRoot(request: Request,context: Context,@Inject b: B,@Inject rtContext: RtContext,@Inject sessionManager: SessionManager,parameterBean: ParameterBean):String{
+    @Controller("/{path}")
+    fun onRoot(request: Request,context: Context,@Inject b: B,@Inject rtContext: RtContext,@Inject sessionManager: SessionManager,parameterBean: ParameterBean,@ParamsQuery("path") path:String?):String{
         Log.e("ADSAD","onRoot:${request.getPackage().getSession().getId()},rtContext:$rtContext,sessioManager:$sessionManager,pb:$parameterBean")
-        return "onRoot:${request.getPackage().getSession().getId()},rtContext:$rtContext,sessioManager:$sessionManager,pb:$parameterBean"
-    }
-
-    @Controller("/a/{id}")
-    fun onRoot2(request: Request,context: Context,@Inject b: B,@ParamsQuery("id") id:Int?,@ParamsQuery("dd") dd:Int?): String {
-        Log.e("ADSAD","onRoot2:${request.getPackage().getSession().getId()}")
-        return (id?.toString()?:"N Id") +":"+ (dd?.toString()?:"N DD")
+        return path?:"No path"
     }
 }

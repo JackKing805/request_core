@@ -10,13 +10,13 @@ import com.jerry.request_core.R
 import com.jerry.request_core.constants.FileType
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.request_core.extensions.isResources
-import com.jerry.request_core.extensions.resourcesName
+import com.jerry.request_core.extensions.resourcesPath
 import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.rt.core.http.pojo.Response
 
-@ConfigRegister(-1, registerClass = Any::class)
+@ConfigRegister(-999999999, registerClass = Any::class)
 class DefaultResourcesDispatcherConfigRegister : IConfig() {
     private  val resourcesDispatchers: MutableList<ResourcesDeal> = mutableListOf()
     override fun init(annotation: Configuration, clazz:Any) {
@@ -62,7 +62,7 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
                     }
                 }
             }
-            dealDefault(context,request,response,request.getPackage().getRequestURI().resourcesName())
+            dealDefault(context,request,response,request.getPackage().getRequestURI().resourcesPath())
             return false
         }
         return true
@@ -97,7 +97,7 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
         internal fun dealResources(context: Context,request: Request,response: Response):Boolean{
             val requestURI = request.getPackage().getRequestURI()
             val path = requestURI.path?:""
-            val responsePath = requestURI.resourcesName()
+            val responsePath = requestURI.resourcesPath()
             if (path == url || path.startsWith(url)){
                 val resourcesPath = resourcesDispatcher!!.onResourcesRequest(context, request, response,responsePath)
                 ResponseUtils.dispatcherReturn(false,response,resourcesPath)

@@ -148,11 +148,25 @@ fun URI.isResources(): Boolean {
     return if (path == null) {
         return false
     } else {
-        path.contains(".") && !path.endsWith(".") && !path.startsWith(".")
+        if (query==null){
+            if (path.endsWith("/")){
+                false
+            }else{
+                val indexOf = path.lastIndexOf("/")
+                if (indexOf!=-1){
+                    val name = path.substring(indexOf+1)
+                    name.contains(".") && !name.endsWith(".") && !name.startsWith(".")
+                }else{
+                    path.contains(".") && !path.endsWith(".") && !path.startsWith(".")
+                }
+            }
+        }else{
+            false
+        }
     }
 }
 
-fun URI.resourcesName(): String {
+fun URI.resourcesPath(): String {
     return if (path == null) {
         ""
     } else {

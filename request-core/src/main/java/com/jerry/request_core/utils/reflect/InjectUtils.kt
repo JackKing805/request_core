@@ -6,11 +6,12 @@ import com.jerry.request_core.factory.InjectFactory
 import java.lang.reflect.AnnotatedElement
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
+import kotlin.reflect.safeCast
 
 object InjectUtils {
     @Throws(Exception::class)
     fun invokeMethod(any: Any,method: Method,provider:Array<Any> = arrayOf()):Any?{
-        val args = mutableListOf<Any>()
+        val args = mutableListOf<Any?>()
         val parameters = method.parameters
         parameters.forEach {
             val haveInject = ReflectUtils.haveAnnotation(it,Inject::class.java)
@@ -20,7 +21,7 @@ object InjectUtils {
                     it.type
                 )
             }else{
-                provider.find { a-> ReflectUtils.isSameClass(it.type,a::class.java) }?:throw InvokeMethodException("please provider resources :${it.type}")
+                provider.find { a-> ReflectUtils.isSameClass(it.type,a::class.java) }
             }
             args.add(injectBean)
         }
@@ -34,7 +35,7 @@ object InjectUtils {
 
     @Throws(Exception::class)
     fun invokeMethod(any: Any,method: Method,provider:(pa:Parameter)->Any?):Any?{
-        val args = mutableListOf<Any>()
+        val args = mutableListOf<Any?>()
         val parameters = method.parameters
         parameters.forEach {
             val haveInject = ReflectUtils.haveAnnotation(it,Inject::class.java)
@@ -44,7 +45,7 @@ object InjectUtils {
                     it.type
                 )
             }else{
-                provider(it)?:throw InvokeMethodException("please provider resources :${it.type}")
+                provider(it)
             }
             args.add(injectBean)
         }

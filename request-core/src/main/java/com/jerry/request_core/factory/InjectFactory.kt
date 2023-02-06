@@ -7,10 +7,15 @@ import com.jerry.request_core.additation.DefaultAuthConfigRegister
 import com.jerry.request_core.additation.DefaultResourcesDispatcherConfigRegister
 import com.jerry.request_core.additation.DefaultRtConfigRegister
 import com.jerry.request_core.additation.DefaultRtInitConfigRegister
+import com.jerry.request_core.anno.ParamsQuery
+import com.jerry.request_core.exception.IllPathException
+import com.jerry.request_core.exception.InitErrorException
+import com.jerry.request_core.extensions.isBasicType
 import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils.injectField
 import java.lang.reflect.AnnotatedElement
 import java.lang.reflect.Method
+import java.util.regex.Pattern
 
 /**
  * 反射工具
@@ -133,7 +138,11 @@ internal object InjectFactory {
     }
 
     private fun initController(mutableList: MutableList<Class<*>>) {
-        mutableList.forEach {
+        val findPathParams = "(^.*)\\{(.*?)\\}"
+        val pathPattern = Pattern.compile(findPathParams)
+
+
+        mutableList.filter { ReflectUtils.haveAnnotation(it,Controller::class.java) }.forEach {
             val controllerAnnotation = ReflectUtils.getAnnotation(it, Controller::class.java)
             if (controllerAnnotation != null) {
                 val isClassJson = controllerAnnotation.isRest
@@ -155,9 +164,42 @@ internal object InjectFactory {
                                 "/" + mc.value
                             }
                         }
+
+
+
                         val fullPath = clazzPath + methodPath
+                        val matcher = pathPattern.matcher(fullPath)
                         val controllerClazzIns = it.newInstance()
-                        controllerMappers.add(
+                        val controllerMapper = if (matcher.find()){
+                            val path = matcher.group(1)!!
+                            val param = matcher.group(2)!!
+                            if (!path.endsWith("/")){
+                                throw IllPathException(fullPath)
+                            }
+
+                            val realPath = if (path.length == 1){
+                                path
+                            }else{
+                                path.substring(0,path.length-1)
+                            }
+
+                            m.parameters.forEach { mp->
+                                if (ReflectUtils.haveAnnotation(mp,ParamsQuery::class.java) && !mp.type.isBasicType()){
+                                    throw InitErrorException("ParamsQuery must be basic type")
+                                }
+                            }
+
+                            ControllerMapper(
+                                controllerClazzIns,
+                                m,
+                                mc.requestMethod,
+                                isClassJson or isMethodJson,
+                                path = realPath,
+                                ControllerMapper.PathParams(
+                                    param
+                                )
+                            )
+                        }else{
                             ControllerMapper(
                                 controllerClazzIns,
                                 m,
@@ -165,6 +207,10 @@ internal object InjectFactory {
                                 isClassJson or isMethodJson,
                                 fullPath
                             )
+                        }
+
+                        controllerMappers.add(
+                            controllerMapper
                         )
                     }
                 }
@@ -203,7 +249,35 @@ internal object InjectFactory {
     fun getControllers() = controllerMappers
 
     fun getController(path: String): ControllerMapper? {
-        return getControllers().find { t -> t.path == path }
+        val regex = "(^.*)\\/(.*)"
+        val compile = Pattern.compile(regex)
+
+
+        val controllers = getControllers()
+
+        fun fullCheck(controllerPath:String,path:String):Boolean{
+            return if (path.length!=1){
+                if (path.endsWith("/")){
+                    path.substring(0,path.length-1)==controllerPath
+                }else{
+                    controllerPath == path
+                }
+            }else{
+                controllerPath == path
+            }
+        }
+
+        controllers.forEach { t->
+            if (fullCheck(t.path,path)){
+                return t
+            }
+        }
+        val matcher = compile.matcher(path)
+        if (matcher.find()){
+            val rPath = matcher.group(1)!!
+            return controllers.find { it.path==rPath }
+        }
+        return null
     }
 
     fun getConfigRegisters() = listContainsBy {
@@ -302,6 +376,10 @@ internal data class ControllerMapper(
     val method: Method,
     val requestMethod: RequestMethod,
     val isRestController: Boolean,
-    val path: String
-)
-
+    val path: String,
+    val pathParam:PathParams?=null,
+){
+    data class PathParams(
+        val name:String
+    )
+}

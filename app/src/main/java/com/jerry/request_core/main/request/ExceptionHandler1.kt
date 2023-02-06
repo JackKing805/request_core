@@ -3,6 +3,8 @@ package com.jerry.request_core.main.request
 import android.util.Log
 import com.jerry.request_core.anno.ExceptionHandler
 import com.jerry.request_core.anno.ExceptionRule
+import com.jerry.request_core.exception.NotSupportPathParamsTypeException
+import com.jerry.request_core.exception.PathParamsConvertErrorException
 
 @ExceptionRule
 class ExceptionHandler1 {
@@ -14,9 +16,9 @@ class ExceptionHandler1 {
         return "onNull"
     }
 
-    @ExceptionHandler(IllegalArgumentException::class)
-    fun onIll(e:IllegalArgumentException):String{
+    @ExceptionHandler(PathParamsConvertErrorException::class)
+    fun onIll(e:PathParamsConvertErrorException):String{
         Log.e("ADSAD","onNull:$e")
-        return "onIll"
+        return "NotSupportPathParamsTypeException"
     }
 }

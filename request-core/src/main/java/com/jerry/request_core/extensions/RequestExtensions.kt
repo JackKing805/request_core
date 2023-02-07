@@ -1,13 +1,16 @@
 package com.jerry.request_core.extensions
 
+import android.content.Context
 import com.blankj.utilcode.util.GsonUtils
 import com.jerry.rt.core.http.protocol.RtMimeType
 import com.jerry.request_core.Core
+import com.jerry.request_core.constants.FileType
 import com.jerry.request_core.exception.NotSupportPathParamsTypeException
 import com.jerry.request_core.factory.ControllerMapper
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import java.lang.reflect.Field
 import java.net.URI
 import java.net.URL
 import java.net.URLDecoder
@@ -126,6 +129,19 @@ fun URI.matchUrlPath(localRegisterPath: String): Boolean {
     return path == localRegisterPath
 }
 
+fun String.getJustPath():String{
+    val uri = URI.create(this)
+    return if (uri.path.length==1){
+        uri.path
+    }else{
+        if (uri.path.endsWith("/")){
+            uri.path.substring(0,uri.path.length-1)
+        }else{
+            uri.path
+        }
+    }
+}
+
 fun URI?.parameterToArray(): Map<String, String> {
     return if (this == null) {
         emptyMap()
@@ -166,6 +182,9 @@ fun URI.isResources(): Boolean {
     }
 }
 
+/**
+ * 只能获取去除域名加端口后的路径，不精确
+ */
 fun URI.resourcesPath(): String {
     return if (path == null) {
         ""
@@ -222,3 +241,50 @@ fun Class<*>.isBasicType(): Boolean {
         else ->false
     }
 }
+
+fun String.isFileExists(context: Context):Boolean{
+    val matchFileType = FileType.matchFileType(this)
+    return if (matchFileType!=null){
+        when(matchFileType.fileType){
+            FileType.SD_CARD -> File(this).exists()
+            FileType.ASSETS -> try {
+                val open = context.assets.open(this)
+                open.close()
+                true
+            }catch (e:Exception){
+                false
+            }
+            FileType.RAW -> try {
+                val openRawResource = context.resources.openRawResource(this.toInt())
+                openRawResource.close()
+                true
+            }catch (e:Exception){
+                false
+            }
+            FileType.APP_FILE -> File(this).exists()
+        }
+    }else{
+        File(this).exists()
+    }
+}
+
+//找出两个元素的交集
+fun String.sameString(strings:String):String{
+    var aa = ""
+    var bb = ""
+    for (i in 0 until length){
+        val a = get(i)
+        aa+=a
+        if (strings.length>i){
+            val b= strings[i]
+            bb+=b
+            if (a!=b){
+                return aa.substring(0,aa.length-1)
+            }
+        }else{
+            return aa
+        }
+    }
+    return this
+}
+

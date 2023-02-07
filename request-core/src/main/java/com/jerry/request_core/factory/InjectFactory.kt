@@ -10,6 +10,7 @@ import com.jerry.request_core.additation.DefaultRtInitConfigRegister
 import com.jerry.request_core.anno.ParamsQuery
 import com.jerry.request_core.exception.IllPathException
 import com.jerry.request_core.exception.InitErrorException
+import com.jerry.request_core.extensions.getJustPath
 import com.jerry.request_core.extensions.isBasicType
 import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils.injectField
@@ -256,15 +257,8 @@ internal object InjectFactory {
         val controllers = getControllers()
 
         fun fullCheck(controllerPath:String,path:String):Boolean{
-            return if (path.length!=1){
-                if (path.endsWith("/")){
-                    path.substring(0,path.length-1)==controllerPath
-                }else{
-                    controllerPath == path
-                }
-            }else{
-                controllerPath == path
-            }
+            val justPath = path.getJustPath()
+            return justPath==controllerPath
         }
 
         controllers.forEach { t->

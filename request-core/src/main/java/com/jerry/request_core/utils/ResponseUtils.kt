@@ -51,27 +51,27 @@ object ResponseUtils{
                     }else{
                         when(fileType.fileType){
                             FileType.SD_CARD -> {
-                                if (fileType.str.startsWith(rootDir)){
-                                    response.writeFile(File(fileType.str))
+                                if (fileType.fileName.startsWith(rootDir)){
+                                    response.writeFile(File(fileType.fileName))
                                 }else{
-                                    response.writeFile(File(rootDir,fileType.str))
+                                    response.writeFile(File(rootDir,fileType.fileName))
                                 }
                             }
                             FileType.ASSETS -> {
-                                val byteArrayFromAssets = fileType.str.byteArrayFromAssets()
+                                val byteArrayFromAssets = fileType.fileName.byteArrayFromAssets()
                                 if (byteArrayFromAssets!=null){
-                                    response.write(byteArrayFromAssets,fileType.str.getFileMimeType())
+                                    response.write(byteArrayFromAssets,fileType.fileName.getFileMimeType())
                                 }else{
                                     dispatcherError(response,404)
                                 }
                             }
                             FileType.APP_FILE -> {
-                                response.writeFile(File(Core.getApplication().filesDir,fileType.str))
+                                response.writeFile(File(Core.getApplication().filesDir,fileType.fileName))
                             }
                             FileType.RAW -> {
-                                val raw = fileType.str.toInt().byteArrayFromRaw()
+                                val raw = fileType.fileName.toInt().byteArrayFromRaw()
                                 if (raw!=null){
-                                    response.write(raw,fileType.str.getFileMimeType())
+                                    response.write(raw,fileType.fileName.getFileMimeType())
                                 }else{
                                     dispatcherError(response,404)
                                 }

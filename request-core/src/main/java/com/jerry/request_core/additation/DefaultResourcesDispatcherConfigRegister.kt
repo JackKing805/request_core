@@ -11,10 +11,13 @@ import com.jerry.request_core.constants.FileType
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.request_core.extensions.isResources
 import com.jerry.request_core.extensions.resourcesPath
+import com.jerry.request_core.extensions.sameString
+import com.jerry.request_core.factory.InjectFactory
 import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.rt.core.http.pojo.Response
+import java.io.File
 
 @ConfigRegister(-999999999, registerClass = Any::class)
 class DefaultResourcesDispatcherConfigRegister : IConfig() {
@@ -53,16 +56,34 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
         response: Response,
         IConfigControllerMapper: IConfigControllerMapper?
     ): Boolean {
+        if (IConfigControllerMapper!=null){
+            return true
+        }
         val requestURI = request.getPackage().getRequestURI()
         if (requestURI.isResources()){
+            val path = request.getPackage().getRequestPath()
+            val referer = request.getPackage().getHeader().getHeaderValue("Referer","")
+            var resourcesPath = if (referer.isEmpty() || referer==request.getPackage().getRootAbsolutePath()){
+                path
+            }else{
+                val c = InjectFactory.getControllers().find { path.startsWith(it.path) }
+                if (c!=null){
+                    path.replace(c.path,"")
+                }else{
+                    path
+                }
+            }
+            if (resourcesPath.startsWith("/")){
+                resourcesPath = resourcesPath.substring(1)
+            }
             if (resourcesDispatchers.isNotEmpty()){
                 for (i in resourcesDispatchers){
-                    if (i.dealResources(context, request, response)){
+                    if (i.dealResources(context, request, response,resourcesPath)){
                         return false
                     }
                 }
             }
-            dealDefault(context,request,response,request.getPackage().getRequestURI().resourcesPath())
+            dealDefault(context,request,response,resourcesPath)
             return false
         }
         return true
@@ -94,13 +115,12 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
             this.resourcesDispatcher = requestHandler
         }
 
-        internal fun dealResources(context: Context,request: Request,response: Response):Boolean{
+        internal fun dealResources(context: Context,request: Request,response: Response,resourcesPath: String):Boolean{
             val requestURI = request.getPackage().getRequestURI()
             val path = requestURI.path?:""
-            val responsePath = requestURI.resourcesPath()
             if (path == url || path.startsWith(url)){
-                val resourcesPath = resourcesDispatcher!!.onResourcesRequest(context, request, response,responsePath)
-                ResponseUtils.dispatcherReturn(false,response,resourcesPath)
+                val resultResourcesPath = resourcesDispatcher!!.onResourcesRequest(context, request, response,resourcesPath)
+                ResponseUtils.dispatcherReturn(false,response,resultResourcesPath)
                 return true
             }else{
                 return false

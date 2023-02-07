@@ -30,9 +30,10 @@ enum class FileType(val content:String) {
             return str.substring(fileType.content.length)
         }
     }
+
+    data class ResultFileType(
+        val fileType: FileType,
+        val fileName:String
+    )
 }
 
-data class ResultFileType(
-    val fileType: FileType,
-    val str:String
-)

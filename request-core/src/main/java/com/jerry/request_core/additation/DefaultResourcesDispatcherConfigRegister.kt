@@ -56,9 +56,6 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
         response: Response,
         IConfigControllerMapper: IConfigControllerMapper?
     ): Boolean {
-        if (IConfigControllerMapper!=null){
-            return true
-        }
         val requestURI = request.getPackage().getRequestURI()
         if (requestURI.isResources()){
             val path = request.getPackage().getRequestPath()

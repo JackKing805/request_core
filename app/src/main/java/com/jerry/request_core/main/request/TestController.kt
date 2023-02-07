@@ -20,11 +20,7 @@ class TestController {
         if (page==null){
             return FileType.ASSETS.content + "index.html"
         }else{
-            if (page=="index"){
-                return FileType.ASSETS.content + page + ".html"
-            }else{
-                return FileType.ASSETS.content + page
-            }
+            return FileType.ASSETS.content + page + ".html"
         }
     }
 

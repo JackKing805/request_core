@@ -1,6 +1,7 @@
 package com.jerry.request_core.additation
 
 import android.content.Context
+import android.util.Log
 import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.annotations.Configuration
 import com.jerry.request_base.bean.IConfigControllerMapper
@@ -10,7 +11,7 @@ import com.jerry.request_core.R
 import com.jerry.request_core.constants.FileType
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.request_core.extensions.isResources
-import com.jerry.request_core.extensions.resourcesPath
+import com.jerry.request_core.extensions.samePath
 import com.jerry.request_core.factory.InjectFactory
 import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
@@ -57,17 +58,15 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
     ): Boolean {
         val requestURI = request.getPackage().getRequestURI()
         if (requestURI.isResources()){
+            val fullPath = request.getPackage().getRequestAbsolutePath()
             val path = request.getPackage().getRequestPath()
             val referer = request.getPackage().getHeader().getHeaderValue("Referer","")
-            var resourcesPath = if (referer.isEmpty() || referer==request.getPackage().getRootAbsolutePath()){
+            val root = request.getPackage().getRootAbsolutePath()
+            var resourcesPath = if (referer.isEmpty() || referer==root){
                 path
             }else{
-                val c = InjectFactory.getControllers().find { path.startsWith(it.path) }
-                if (c!=null){
-                    path.replace(c.path,"")
-                }else{
-                    path
-                }
+                val same = fullPath samePath referer
+                fullPath.replace(same,"")
             }
             if (resourcesPath.startsWith("/")){
                 resourcesPath = resourcesPath.substring(1)
@@ -114,12 +113,12 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
         internal fun dealResources(context: Context,request: Request,response: Response,resourcesPath: String):Boolean{
             val requestURI = request.getPackage().getRequestURI()
             val path = requestURI.path?:""
-            if (path == url || path.startsWith(url)){
+            return if (path == url || path.startsWith(url)){
                 val resultResourcesPath = resourcesDispatcher!!.onResourcesRequest(context, request, response,resourcesPath)
                 ResponseUtils.dispatcherReturn(false,response,resultResourcesPath)
-                return true
+                true
             }else{
-                return false
+                false
             }
         }
     }

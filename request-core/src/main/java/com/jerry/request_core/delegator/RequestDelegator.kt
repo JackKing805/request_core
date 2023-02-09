@@ -1,16 +1,15 @@
 package com.jerry.request_core.delegator
 
 import android.content.Context
-import com.blankj.utilcode.util.GsonUtils
+import com.jerry.request_core.base.bean.ControllerResult
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 import com.jerry.request_core.Core
 import com.jerry.request_core.additation.DefaultRtConfigRegister
-import com.jerry.request_core.anno.ExceptionHandler
-import com.jerry.request_core.anno.ExceptionRule
-import com.jerry.request_core.anno.ParamsQuery
+import com.jerry.request_core.base.annotations.ExceptionHandler
+import com.jerry.request_core.base.annotations.ExceptionRule
+import com.jerry.request_core.base.annotations.ParamsQuery
 import com.jerry.request_core.bean.ParameterBean
-import com.jerry.request_core.exception.IllParamsQueryException
 import com.jerry.request_core.exception.InvokeMethodException
 import com.jerry.request_core.exception.NotSupportPathParamsTypeException
 import com.jerry.request_core.exception.PathParamsConvertErrorException
@@ -22,10 +21,7 @@ import com.jerry.request_core.factory.InjectFactory
 import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils
-import com.jerry.rt.bean.RtConfig
-import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.Client
-import com.jerry.rt.core.http.interfaces.ISessionManager
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import kotlin.reflect.KClass
@@ -53,10 +49,7 @@ internal object RequestDelegator {
         if (controllerMapper != null) {
             if (controllerMapper.requestMethod.content.equals(request.getPackage().method, true)) {
                 try {
-                    val pbBean = ParameterBean(
-                        request.getPackage()
-                            .getRequestURI().parameterToArray()
-                    )
+                    val pbBean = ParameterBean(request.getPackage().getRequestURI().parameterToArray())
 
                     val invoke = try {
                         InjectUtils.invokeMethod(
@@ -132,7 +125,9 @@ internal object RequestDelegator {
                     if (invoke == null) {
                         ResponseUtils.dispatcherError(response, 500)
                     } else {
-                        if (RequestFactory.onRequestEnd(context, request, response)) {
+                        if (RequestFactory.onRequestEnd(context, request, response,
+                                ControllerResult(controllerMapper.path,invoke)
+                            )) {
                             ResponseUtils.dispatcherReturn(
                                 controllerMapper.isRestController,
                                 response,

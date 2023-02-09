@@ -1,12 +1,11 @@
 package com.jerry.request_core.utils.reflect
 
-import com.jerry.request_base.annotations.Inject
+import com.jerry.request_core.base.annotations.Inject
 import com.jerry.request_core.exception.InvokeMethodException
 import com.jerry.request_core.factory.InjectFactory
 import java.lang.reflect.AnnotatedElement
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
-import kotlin.reflect.safeCast
 
 object InjectUtils {
     @Throws(Exception::class)
@@ -14,7 +13,7 @@ object InjectUtils {
         val args = mutableListOf<Any?>()
         val parameters = method.parameters
         parameters.forEach {
-            val haveInject = ReflectUtils.haveAnnotation(it,Inject::class.java)
+            val haveInject = ReflectUtils.haveAnnotation(it, Inject::class.java)
             val injectBean = if (haveInject){
                 getInjectBean(
                     it,
@@ -38,7 +37,7 @@ object InjectUtils {
         val args = mutableListOf<Any?>()
         val parameters = method.parameters
         parameters.forEach {
-            val haveInject = ReflectUtils.haveAnnotation(it,Inject::class.java)
+            val haveInject = ReflectUtils.haveAnnotation(it, Inject::class.java)
             val injectBean = if (haveInject){
                 getInjectBean(
                     it,
@@ -57,7 +56,7 @@ object InjectUtils {
     }
 
     private fun getInjectBean(any: AnnotatedElement,clazz: Class<*>):Any{
-        val inject = ReflectUtils.haveAnnotation(any,Inject::class.java)
+        val inject = ReflectUtils.haveAnnotation(any, Inject::class.java)
         if (!inject){
             throw InvokeMethodException("please use inject annotation to find bean in bean factory")
         }

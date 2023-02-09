@@ -1,9 +1,8 @@
 package com.jerry.request_core.main.request
 
 import android.util.Log
-import com.jerry.request_core.anno.ExceptionHandler
-import com.jerry.request_core.anno.ExceptionRule
-import com.jerry.request_core.exception.NotSupportPathParamsTypeException
+import com.jerry.request_core.base.annotations.ExceptionHandler
+import com.jerry.request_core.base.annotations.ExceptionRule
 import com.jerry.request_core.exception.PathParamsConvertErrorException
 
 @ExceptionRule

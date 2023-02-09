@@ -1,8 +1,8 @@
 package com.jerry.request_core.factory
 
 import android.content.Context
-import com.jerry.request_base.bean.IConfigControllerMapper
-import com.jerry.request_base.interfaces.IConfig
+import com.jerry.request_core.base.bean.ControllerReferrer
+import com.jerry.request_core.base.bean.ControllerResult
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 
@@ -14,9 +14,9 @@ internal object RequestFactory {
         InjectFactory.inject(injects)
     }
 
-    fun onRequestPre(context: Context,request: Request,response: Response,controllerMapper: ControllerMapper?):Boolean{
+    fun onRequestPre(context: Context,request: Request,response: Response,controllerMapper: CoreControllerMapper?):Boolean{
         val mapper = if (controllerMapper!=null){
-            IConfigControllerMapper(controllerMapper.instance,controllerMapper.method)
+            ControllerReferrer(controllerMapper.instance,controllerMapper.method,controllerMapper.path)
         }else{
             null
         }
@@ -28,16 +28,16 @@ internal object RequestFactory {
         return true
     }
 
-    fun onRequestEnd(context: Context,request: Request,response: Response):Boolean{
+    fun onRequestEnd(context: Context,request: Request,response: Response,controllerResult: ControllerResult):Boolean{
         InjectFactory.getConfigRegisters().forEach {
-            if (!it.instance.onRequestEnd(context,request,response)){
+            if (!it.instance.onRequestEnd(context,request,response,controllerResult)){
                 return false
             }
         }
         return true
     }
 
-    fun matchController(path:String): ControllerMapper?{
+    fun matchController(path:String): CoreControllerMapper?{
         return InjectFactory.getController(path)
     }
 }

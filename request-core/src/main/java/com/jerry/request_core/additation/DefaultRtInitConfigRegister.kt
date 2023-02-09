@@ -1,11 +1,12 @@
 package com.jerry.request_core.additation
 
 import android.content.Context
-import com.jerry.request_base.annotations.ConfigRegister
-import com.jerry.request_base.annotations.Configuration
-import com.jerry.request_base.bean.IConfigControllerMapper
-import com.jerry.request_base.interfaces.IConfig
+import com.jerry.request_core.base.annotations.ConfigRegister
+import com.jerry.request_core.base.annotations.Configuration
+import com.jerry.request_core.base.interfaces.IConfig
 import com.jerry.request_core.Core
+import com.jerry.request_core.base.bean.ControllerReferrer
+import com.jerry.request_core.base.bean.ControllerResult
 import com.jerry.request_core.config.Config
 import com.jerry.request_core.factory.InjectFactory
 import com.jerry.rt.bean.RtConfig
@@ -37,15 +38,19 @@ class DefaultRtInitConfigRegister : IConfig() {
         }
     }
 
-    override fun onRequestEnd(context: Context, request: Request, response: Response): Boolean {
+    override fun onRequestEnd(
+        context: Context,
+        request: Request,
+        response: Response,
+        controllerResult: ControllerResult
+    ): Boolean {
         return true
     }
-
     override fun onRequestPre(
         context: Context,
         request: Request,
         response: Response,
-        IConfigControllerMapper: IConfigControllerMapper?
+        controllerReferrer: ControllerReferrer?
     ): Boolean {
         return true
     }

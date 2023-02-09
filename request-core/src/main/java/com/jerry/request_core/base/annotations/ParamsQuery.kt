@@ -1,7 +1,4 @@
-package com.jerry.request_core.anno
-
-import com.jerry.request_base.annotations.Bean
-import kotlin.reflect.KClass
+package com.jerry.request_core.base.annotations
 
 /**
  * /q/b/{id}

@@ -1,6 +1,5 @@
-package com.jerry.request_core.anno
+package com.jerry.request_core.base.annotations
 
-import com.jerry.request_base.annotations.Bean
 import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.FUNCTION)

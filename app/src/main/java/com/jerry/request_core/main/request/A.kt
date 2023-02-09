@@ -2,9 +2,9 @@ package com.jerry.request_core.main.request
 
 import android.content.Context
 import android.util.Log
-import com.jerry.request_base.annotations.Bean
-import com.jerry.request_base.annotations.Configuration
-import com.jerry.request_base.annotations.Inject
+import com.jerry.request_core.base.annotations.Bean
+import com.jerry.request_core.base.annotations.Configuration
+import com.jerry.request_core.base.annotations.Inject
 import com.jerry.request_core.additation.DefaultResourcesDispatcherConfigRegister
 import com.jerry.request_core.config.Config
 import com.jerry.request_core.constants.FileType

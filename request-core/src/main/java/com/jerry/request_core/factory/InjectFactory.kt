@@ -1,19 +1,17 @@
 package com.jerry.request_core.factory
 
-import com.jerry.request_base.annotations.*
-import com.jerry.request_base.bean.RequestMethod
-import com.jerry.request_base.interfaces.IConfig
+import com.jerry.request_core.base.bean.RequestMethod
+import com.jerry.request_core.base.interfaces.IConfig
 import com.jerry.request_core.additation.DefaultAuthConfigRegister
 import com.jerry.request_core.additation.DefaultResourcesDispatcherConfigRegister
 import com.jerry.request_core.additation.DefaultRtConfigRegister
 import com.jerry.request_core.additation.DefaultRtInitConfigRegister
-import com.jerry.request_core.anno.ParamsQuery
+import com.jerry.request_core.base.annotations.*
 import com.jerry.request_core.exception.IllPathException
 import com.jerry.request_core.exception.InitErrorException
 import com.jerry.request_core.extensions.getJustPath
 import com.jerry.request_core.extensions.isBasicType
 import com.jerry.request_core.utils.reflect.ReflectUtils
-import com.jerry.request_core.utils.reflect.ReflectUtils.injectField
 import java.lang.reflect.AnnotatedElement
 import java.lang.reflect.Method
 import java.util.regex.Pattern
@@ -23,7 +21,7 @@ import java.util.regex.Pattern
  */
 internal object InjectFactory {
     private val beans = mutableListOf<BeanMapper>()
-    private val controllerMappers = mutableListOf<ControllerMapper>()
+    private val controllerMappers = mutableListOf<CoreControllerMapper>()
     private var defaultIsInit = false
     private val defaultInjects = mutableListOf<Class<*>>(
         DefaultAuthConfigRegister::class.java,
@@ -143,7 +141,7 @@ internal object InjectFactory {
         val pathPattern = Pattern.compile(findPathParams)
 
 
-        mutableList.filter { ReflectUtils.haveAnnotation(it,Controller::class.java) }.forEach {
+        mutableList.filter { ReflectUtils.haveAnnotation(it, Controller::class.java) }.forEach {
             val controllerAnnotation = ReflectUtils.getAnnotation(it, Controller::class.java)
             if (controllerAnnotation != null) {
                 val isClassJson = controllerAnnotation.isRest
@@ -190,18 +188,18 @@ internal object InjectFactory {
                                 }
                             }
 
-                            ControllerMapper(
+                            CoreControllerMapper(
                                 controllerClazzIns,
                                 m,
                                 mc.requestMethod,
                                 isClassJson or isMethodJson,
                                 path = realPath,
-                                ControllerMapper.PathParams(
+                                CoreControllerMapper.PathParams(
                                     param
                                 )
                             )
                         }else{
-                            ControllerMapper(
+                            CoreControllerMapper(
                                 controllerClazzIns,
                                 m,
                                 mc.requestMethod,
@@ -249,7 +247,7 @@ internal object InjectFactory {
 
     fun getControllers() = controllerMappers
 
-    fun getController(path: String): ControllerMapper? {
+    fun getController(path: String): CoreControllerMapper? {
         val regex = "(^.*)\\/(.*)"
         val compile = Pattern.compile(regex)
 
@@ -296,7 +294,7 @@ internal object InjectFactory {
         listContainsBy(condition).firstOrNull()
 
     fun getBeanByInjectOrClass(annotatedElement: AnnotatedElement,clazz: Class<*>) = getBeanBy {
-        val inject = ReflectUtils.getAnnotation(annotatedElement,Inject::class.java)
+        val inject = ReflectUtils.getAnnotation(annotatedElement, Inject::class.java)
         if (inject!=null && inject.name.isNotEmpty() && it.beanName.isNotEmpty() ) {
             it.beanName == inject.name
         } else {
@@ -365,7 +363,7 @@ internal data class ConfigurationMapper(
     val annotation: Configuration
 )
 
-internal data class ControllerMapper(
+internal data class CoreControllerMapper(
     val instance: Any,
     val method: Method,
     val requestMethod: RequestMethod,

@@ -5,8 +5,9 @@ import com.blankj.utilcode.util.GsonUtils
 import com.jerry.rt.core.http.protocol.RtMimeType
 import com.jerry.request_core.Core
 import com.jerry.request_core.constants.FileType
-import com.jerry.request_core.exception.NotSupportPathParamsTypeException
-import com.jerry.request_core.factory.ControllerMapper
+import com.jerry.request_core.factory.CoreControllerMapper
+import com.jerry.request_core.utils.JavaUtils
+import com.jerry.rt.core.http.pojo.Request
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -160,27 +161,41 @@ fun URI?.parameterToArray(): Map<String, String> {
 }
 
 
-fun URI.isResources(): Boolean {
-    return if (path == null) {
-        return false
-    } else {
-        if (query==null){
-            if (path.endsWith("/")){
-                false
-            }else{
-                val indexOf = path.lastIndexOf("/")
-                if (indexOf!=-1){
-                    val name = path.substring(indexOf+1)
-                    name.contains(".") && !name.endsWith(".") && !name.startsWith(".")
-                }else{
-                    path.contains(".") && !path.endsWith(".") && !path.startsWith(".")
-                }
-            }
-        }else{
-            false
-        }
+
+fun Request.isResourceRequest():RequestType{
+    val fullPath = getPackage().getRequestAbsolutePath()
+    val path = getPackage().getRequestPath()
+    val referer = getPackage().getHeader().getHeaderValue("Referer","")
+    val root = getPackage().getRootAbsolutePath()
+    var resourcesPath = if (referer.isEmpty() || referer==root){
+        path
+    }else{
+        val same = fullPath samePath referer
+        fullPath.replace(same,"")
+    }
+    if (resourcesPath.startsWith("/")){
+        resourcesPath = resourcesPath.substring(1)
+    }
+    val query = getPackage().getRequestURI().query
+    if (query!=null){
+        resourcesPath = resourcesPath.replace(query,"")
+    }
+
+    if (resourcesPath.startsWith(Core.getConfig().resourcesPrefix)){
+        return RequestType.Resources(resourcesPath)
+    }else{
+        return RequestType.Controller()
     }
 }
+
+sealed class RequestType{
+    class Resources(
+        val resourcesPath:String
+    ):RequestType()
+
+    class Controller:RequestType()
+}
+
 
 /**
  * 只能获取去除域名加端口后的路径，不精确
@@ -198,7 +213,7 @@ fun URI.resourcesPath(): String {
 }
 
 
-internal fun ControllerMapper.pathParams(fullUrl: String): String? {
+internal fun CoreControllerMapper.pathParams(fullUrl: String): String? {
     if (fullUrl==path){
         return null
     }

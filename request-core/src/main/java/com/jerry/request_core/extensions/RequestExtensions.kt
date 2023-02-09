@@ -269,22 +269,9 @@ fun String.isFileExists(context: Context):Boolean{
 }
 
 //找出两个元素的交集
-fun String.sameString(strings:String):String{
-    var aa = ""
-    var bb = ""
-    for (i in 0 until length){
-        val a = get(i)
-        aa+=a
-        if (strings.length>i){
-            val b= strings[i]
-            bb+=b
-            if (a!=b){
-                return aa.substring(0,aa.length-1)
-            }
-        }else{
-            return aa
-        }
-    }
-    return this
+infix fun String.samePath(string:String):String{
+    return JavaUtils.getSamePath(this,string)
 }
+
+
 

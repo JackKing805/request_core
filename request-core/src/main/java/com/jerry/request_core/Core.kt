@@ -23,7 +23,7 @@ object Core {
     }
 
     fun inject(more:MutableList<Class<*>>){
-        RequestFactory.init(more)
+        InjectFactory.inject(more)
     }
 
     fun setRtConfig(rtConfig: RtConfig){

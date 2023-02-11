@@ -2,15 +2,14 @@ package com.jerry.request_core.extensions
 
 import android.content.Context
 import com.blankj.utilcode.util.GsonUtils
-import com.jerry.rt.core.http.protocol.RtMimeType
 import com.jerry.request_core.Core
 import com.jerry.request_core.constants.FileType
-import com.jerry.request_core.exception.NotSupportPathParamsTypeException
 import com.jerry.request_core.factory.ControllerMapper
+import com.jerry.request_core.utils.JavaUtils
+import com.jerry.rt.core.http.protocol.RtMimeType
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.lang.reflect.Field
 import java.net.URI
 import java.net.URL
 import java.net.URLDecoder

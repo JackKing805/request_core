@@ -1,31 +1,27 @@
 package com.jerry.request_core.delegator
 
 import android.content.Context
-import com.blankj.utilcode.util.GsonUtils
-import com.jerry.rt.core.http.pojo.Request
-import com.jerry.rt.core.http.pojo.Response
 import com.jerry.request_core.Core
 import com.jerry.request_core.additation.DefaultRtConfigRegister
 import com.jerry.request_core.anno.ExceptionHandler
 import com.jerry.request_core.anno.ExceptionRule
 import com.jerry.request_core.anno.ParamsQuery
 import com.jerry.request_core.bean.ParameterBean
-import com.jerry.request_core.exception.IllParamsQueryException
 import com.jerry.request_core.exception.InvokeMethodException
 import com.jerry.request_core.exception.NotSupportPathParamsTypeException
 import com.jerry.request_core.exception.PathParamsConvertErrorException
-import com.jerry.request_core.factory.RequestFactory
 import com.jerry.request_core.extensions.parameterToArray
 import com.jerry.request_core.extensions.pathParams
 import com.jerry.request_core.extensions.toObject
 import com.jerry.request_core.factory.InjectFactory
+import com.jerry.request_core.factory.RequestFactory
 import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils
-import com.jerry.rt.bean.RtConfig
-import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.Client
-import com.jerry.rt.core.http.interfaces.ISessionManager
+import com.jerry.rt.core.http.pojo.Request
+import com.jerry.rt.core.http.pojo.Response
+import com.jerry.rt.core.http.protocol.RtCode
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import kotlin.reflect.KClass
@@ -123,16 +119,16 @@ internal object RequestDelegator {
                         }
                     } catch (e: InvokeMethodException) {
                         e.printStackTrace()
-                        ResponseUtils.dispatcherError(response, 500)
+                        ResponseUtils.dispatcherError(response,  RtCode._500.code)
                         return
                     } catch (e: Exception) {
                         onException(response, e)
                         return
                     }
                     if (invoke == null) {
-                        ResponseUtils.dispatcherError(response, 500)
+                        ResponseUtils.dispatcherError(response, RtCode._500.code)
                     } else {
-                        if (RequestFactory.onRequestEnd(context, request, response)) {
+                        if (RequestFactory.onRequestEnd(context, request, response,controllerMapper,invoke)) {
                             ResponseUtils.dispatcherReturn(
                                 controllerMapper.isRestController,
                                 response,
@@ -142,15 +138,15 @@ internal object RequestDelegator {
                     }
                 } catch (e: NullPointerException) {
                     e.printStackTrace()
-                    ResponseUtils.dispatcherError(response, 502)
+                    ResponseUtils.dispatcherError(response, RtCode._502.code)
                 }
                 return
             } else {
-                ResponseUtils.dispatcherError(response, 405)
+                ResponseUtils.dispatcherError(response, RtCode._405.code)
                 return
             }
         }
-        ResponseUtils.dispatcherError(response, 404)
+        ResponseUtils.dispatcherError(response, RtCode._404.code)
     }
 
 

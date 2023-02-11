@@ -1,23 +1,18 @@
 package com.jerry.request_core.additation
 
 import android.content.Context
-import android.util.Log
 import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.annotations.Configuration
-import com.jerry.request_base.bean.IConfigControllerMapper
+import com.jerry.request_base.bean.ResourceReferrer
 import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.Core
 import com.jerry.request_core.R
 import com.jerry.request_core.constants.FileType
-import com.jerry.rt.core.http.pojo.Request
-import com.jerry.request_core.extensions.isResources
-import com.jerry.request_core.extensions.samePath
-import com.jerry.request_core.factory.InjectFactory
 import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils
+import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
-import java.io.File
 
 @ConfigRegister(-999999999, registerClass = Any::class)
 class DefaultResourcesDispatcherConfigRegister : IConfig() {
@@ -46,45 +41,24 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
         }
     }
 
-    override fun onRequestEnd(context: Context, request: Request, response: Response): Boolean {
-        return true
-    }
 
-    override fun onRequestPre(
+    override fun onResourceRequest(
         context: Context,
         request: Request,
         response: Response,
-        IConfigControllerMapper: IConfigControllerMapper?
+        resourceReferrer: ResourceReferrer
     ): Boolean {
-        val requestURI = request.getPackage().getRequestURI()
-        if (requestURI.isResources()){
-            val fullPath = request.getPackage().getRequestAbsolutePath()
-            val path = request.getPackage().getRequestPath()
-            val referer = request.getPackage().getHeader().getHeaderValue("Referer","")
-            val root = request.getPackage().getRootAbsolutePath()
-            var resourcesPath = if (referer.isEmpty() || referer==root){
-                path
-            }else{
-                val same = fullPath samePath referer
-                fullPath.replace(same,"")
-            }
-            if (resourcesPath.startsWith("/")){
-                resourcesPath = resourcesPath.substring(1)
-            }
-            if (resourcesDispatchers.isNotEmpty()){
-                for (i in resourcesDispatchers){
-                    if (i.dealResources(context, request, response,resourcesPath)){
-                        return false
-                    }
+        if (resourcesDispatchers.isNotEmpty()){
+            for (i in resourcesDispatchers){
+                if (i.dealResources(context, request, response,resourceReferrer.resourcesPath)){
+                    return false
                 }
             }
-            dealDefault(context,request,response,resourcesPath)
-            return false
         }
+        dealDefault(response,resourceReferrer.resourcesPath)
         return true
     }
-
-    private fun dealDefault(context: Context,request: Request,response: Response,resourcesPath:String){
+    private fun dealDefault(response: Response,resourcesPath:String){
         fun path():String{
             if (resourcesPath=="favicon.ico"){
                 return FileType.RAW.content + R.raw.favicon

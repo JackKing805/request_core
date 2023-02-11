@@ -1,8 +1,10 @@
 package com.jerry.request_core.factory
 
 import android.content.Context
-import com.jerry.request_base.bean.IConfigControllerMapper
-import com.jerry.request_base.interfaces.IConfig
+import com.jerry.request_base.bean.ControllerReferrer
+import com.jerry.request_base.bean.ControllerResult
+import com.jerry.request_base.bean.ResourceReferrer
+import com.jerry.request_core.extensions.samePath
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 
@@ -10,27 +12,50 @@ import com.jerry.rt.core.http.pojo.Response
  * configRegister 会提前注册
  */
 internal object RequestFactory {
-    fun init(injects:MutableList<Class<*>>){
-        InjectFactory.inject(injects)
-    }
-
     fun onRequestPre(context: Context,request: Request,response: Response,controllerMapper: ControllerMapper?):Boolean{
-        val mapper = if (controllerMapper!=null){
-            IConfigControllerMapper(controllerMapper.instance,controllerMapper.method)
+        val referer = request.getPackage().getHeader().getHeaderValue("Referer","")
+        if (referer.isEmpty() && controllerMapper!=null){
+           val controllerReferrer = ControllerReferrer(controllerMapper.path,controllerMapper.instance,controllerMapper.method)
+           InjectFactory.getConfigRegisters().forEach {
+               if (!it.instance.onRequestPre(context,request,response,controllerReferrer)){
+                   return false
+               }
+           }
         }else{
-            null
-        }
-        InjectFactory.getConfigRegisters().forEach {
-            if (!it.instance.onRequestPre(context,request,response,mapper)){
-                return false
+            val rpackage = request.getPackage()
+            val query = rpackage.getRequestURI().query
+           val fullPath = rpackage.getRequestAbsolutePath()
+           val path = rpackage.getRequestPath()
+           val root = rpackage.getRootAbsolutePath()
+           var resourcesPath = if (referer.isEmpty() || referer==root){
+               path
+           }else{
+               val same = fullPath samePath referer
+               fullPath.replace(same,"")
+           }
+           if (resourcesPath.startsWith("/")){
+               resourcesPath = resourcesPath.substring(1)
+           }
+
+            if (query!=null){
+                resourcesPath = resourcesPath.replace("?$query","")
             }
+
+           val resourceReferrer = ResourceReferrer(referer,resourcesPath)
+           InjectFactory.getConfigRegisters().forEach {
+               if (!it.instance.onResourceRequest(context,request,response,resourceReferrer)){
+                   return false
+               }
+           }
         }
         return true
     }
 
-    fun onRequestEnd(context: Context,request: Request,response: Response):Boolean{
+    fun onRequestEnd(context: Context,request: Request,response: Response,controllerMapper:ControllerMapper,result:Any):Boolean{
         InjectFactory.getConfigRegisters().forEach {
-            if (!it.instance.onRequestEnd(context,request,response)){
+            val controllerReferrer = ControllerReferrer(controllerMapper.path,controllerMapper.instance,controllerMapper.method)
+            val controllerResult = ControllerResult(controllerReferrer,result)
+            if (!it.instance.onRequestEnd(context,request,response,controllerResult)){
                 return false
             }
         }

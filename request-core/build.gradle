@@ -32,7 +32,7 @@ dependencies {
     //rt
     compileOnly 'com.github.JackKing805:RtCore:0.3.4'
     //base
-    compileOnly 'com.github.JackKing805:request_base:0.1.2'
+    compileOnly 'com.github.JackKing805:request_base:0.1.5'
 
 
     //corou

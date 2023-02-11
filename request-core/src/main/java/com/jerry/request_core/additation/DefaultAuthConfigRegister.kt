@@ -3,7 +3,7 @@ package com.jerry.request_core.additation
 import android.content.Context
 import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.annotations.Configuration
-import com.jerry.request_base.bean.IConfigControllerMapper
+import com.jerry.request_base.bean.ControllerReferrer
 import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.Core
 import com.jerry.request_core.factory.ControllerMapper
@@ -38,15 +38,12 @@ class DefaultAuthConfigRegister : IConfig() {
         }
     }
 
-    override fun onRequestEnd(context: Context, request: Request, response: Response) :Boolean{
-        return true
-    }
 
     override fun onRequestPre(
         context: Context,
         request: Request,
         response: Response,
-        IConfigControllerMapper: IConfigControllerMapper?
+        controllerReferrer: ControllerReferrer
     ): Boolean {
         requestInterceptorList.forEach {
             val pass = it.hand(context, request, response)

@@ -6,11 +6,13 @@ import com.jerry.request_core.anno.ParamsQuery
 import com.jerry.request_core.constants.FileType
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
+import kotlinx.coroutines.delay
 
 @Controller("/")
 class TestController {
     @Controller("/page/{page}")
-    fun onRootRequest(context: Context, request: Request, response: Response, @ParamsQuery("page") page:String?):String {
+    suspend fun onRootRequest(context: Context, request: Request, response: Response, @ParamsQuery("page") page:String?):String {
+        delay(5000)
         if (page==null){
             return FileType.ASSETS.content + "index.html"
         }else{

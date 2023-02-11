@@ -10,6 +10,7 @@ import com.jerry.request_core.extensions.getFileMimeType
 import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.core.http.protocol.RtCode
 import com.jerry.rt.core.http.protocol.RtContentType
+import com.jerry.rt.core.http.protocol.RtHeader
 import java.io.File
 
 
@@ -18,7 +19,8 @@ internal object ResponseUtils{
 
     fun dispatcherError(response: Response, errorCode: Int) {
         response.setResponseStatusCode(errorCode)
-        response.write(RtCode.match(errorCode).message, RtContentType.TEXT_HTML.content)
+        val type = response.getHeader(RtHeader.CONTENT_TYPE.content)?:RtContentType.TEXT_HTML.content
+        response.write(RtCode.match(errorCode).message, type)
     }
 
     fun dispatcherReturn(
@@ -34,10 +36,11 @@ internal object ResponseUtils{
             dispatcherError(response,  RtCode._500.code)
         } else {
             if (isRestController) {
+                val type = response.getHeader(RtHeader.CONTENT_TYPE.content)?:RtContentType.JSON.content
                 if (returnObject is String) {
-                    response.write(returnObject, RtContentType.JSON.content)
+                    response.write(returnObject, type)
                 } else {
-                    response.write(GsonUtils.toJson(returnObject), RtContentType.JSON.content)
+                    response.write(GsonUtils.toJson(returnObject), type)
                 }
             } else {
                 if (returnObject is String) {
@@ -65,9 +68,11 @@ internal object ResponseUtils{
                             response.setHeader("Location",location)
                             response.sendHeader()
                         } else if(returnObject.startsWith("{")&& returnObject.endsWith("}")){
-                            response.write(returnObject, RtContentType.JSON.content)
+                            val type = response.getHeader(RtHeader.CONTENT_TYPE.content)?:RtContentType.JSON.content
+                            response.write(returnObject, type)
                         }else {
-                            response.write(returnObject, RtContentType.TEXT_PLAIN.content)
+                            val type = response.getHeader(RtHeader.CONTENT_TYPE.content)?:RtContentType.TEXT_PLAIN.content
+                            response.write(returnObject, type)
                         }
                     }else{
                         when(fileType.fileType){
@@ -81,7 +86,8 @@ internal object ResponseUtils{
                             FileType.ASSETS -> {
                                 val byteArrayFromAssets = fileType.fileName.byteArrayFromAssets()
                                 if (byteArrayFromAssets!=null){
-                                    response.write(byteArrayFromAssets,fileType.fileName.getFileMimeType())
+                                    val type = response.getHeader(RtHeader.CONTENT_TYPE.content)?:fileType.fileName.getFileMimeType()
+                                    response.write(byteArrayFromAssets,type)
                                 }else{
                                     dispatcherError(response,RtCode._404.code)
                                 }
@@ -92,7 +98,8 @@ internal object ResponseUtils{
                             FileType.RAW -> {
                                 val raw = fileType.fileName.toInt().byteArrayFromRaw()
                                 if (raw!=null){
-                                    response.write(raw,fileType.fileName.getFileMimeType())
+                                    val type = response.getHeader(RtHeader.CONTENT_TYPE.content)?:fileType.fileName.getFileMimeType()
+                                    response.write(raw,type)
                                 }else{
                                     dispatcherError(response, RtCode._404.code)
                                 }
@@ -102,7 +109,8 @@ internal object ResponseUtils{
                 } else if (returnObject is File) {
                     response.writeFile(returnObject)
                 } else {
-                    response.write(GsonUtils.toJson(returnObject), RtContentType.TEXT_PLAIN.content)
+                    val type = response.getHeader(RtHeader.CONTENT_TYPE.content)?: RtContentType.TEXT_PLAIN.content
+                    response.write(GsonUtils.toJson(returnObject),type)
                 }
             }
         }

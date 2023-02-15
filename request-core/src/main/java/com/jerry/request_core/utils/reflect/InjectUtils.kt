@@ -6,7 +6,6 @@ import com.jerry.request_core.factory.InjectFactory
 import java.lang.reflect.AnnotatedElement
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
-import kotlin.reflect.safeCast
 
 object InjectUtils {
     @Throws(Exception::class)
@@ -45,7 +44,11 @@ object InjectUtils {
                     it.type
                 )
             }else{
-                provider(it)
+                val provider1 = provider(it)
+                if (provider1==null&&it.type.componentType!=null){
+                    throw NullPointerException("yuu can set$it to nullable")
+                }
+                provider1
             }
             args.add(injectBean)
         }

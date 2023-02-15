@@ -19,143 +19,18 @@
   <link rel="stylesheet" href="main.min.css">
 </head>
 <body>
-<!--
-作者：饭饭
-时间：2018.11.27
-描述：本项目使用 Apache License V2.0 开源许可，您可以自由的修改和使用，但请注明出处，非常感谢！
-本项目开源地址：https://github.com/noisky/Homepage
--->
-<span class="mobile btn-mobile-menu">
-        <i class="fa fa-list btn-mobile-menu_icon"></i>
-        <i class="fa fa-angle-up btn-mobile-close_icon hidden"></i>
-    </span>
-<!-- 随机背景图片 -->
-<header class="panel-cover"></header>
-<!-- 必应每日背景图片
-<header class="panel-cover" style="background-image: url('https://api.ffis.me/bing/bing-images.php')"></header> -->
-<!-- 饭饭的随机背景图片api
-<header class="panel-cover" style="background-image: url('https://api.ffis.me/img/images.php')"></header> -->
-
-<div class="panel-main">
-  <div class="panel-main_inner panel-inverted">
-    <div class="panel-main_content">
-      <a href="http://ffis.me/" title="前往 CloudNote's Blog"><img src="img/noisky.jpg" alt="Noisky logo"
-                                                          class="panel-cover_logo logo"></a>
-      <!--微博图标
-      <a href="#" class="Weibo_icon_position"><em title="前往饭饭的微博"
-                                                                              class="Weibo_icon Weibo_icon_logo"></em></a>-->
-      <!--国旗图标-->
-      <a href="#" class="Weibo_icon_position"><em title="庆祝新中国成立70周年" id="myAvatar"
-                                                  class="Weibo_icon Weibo_icon_logo"></em></a>
-
-      <h1 class="panel-title"><a href="http://ffis.me/" title="link to homepage for noisky">CloudNote</a></h1>
-
-      <span class="panel-subtitle" id="hitokoto">『Loading…』</span>
-
-      <hr class="panel-cover_divider">
+<form method="POST" enctype="multipart/form-data" action="/file">
+  <input type="file" name="file">
+  <input type="submit" value="上传文件">
+</form>
 
 
-      <div class="navigation-wrapper">
-        <div>
-          <nav class="cover-navigation">
-            <ul class="navigation">
-              <li class="navigation_item"><a href="https://ffis.me/" title="访问博客">博客</a></li>
-              <li class="navigation_item"><a href="https://img.ffis.me/" target="_blank"
-                                             rel="noopener noreferrer" title="饭饭's 图床">图床</a>
-              </li>
-              <li class="navigation_item"><a href="https://music.ffis.me/" title="饭饭's 下载站">音乐盒</a></li>
-              <li class="navigation_item"><a href="https://sign.ffis.me/" title="饭饭's 签到站">签到站</a></li>
-              <li class="navigation_item"><a href="https://dl.ffis.me/" title="饭饭's 下载站">下载站</a></li>
-              <li class="navigation_item"><a href="https://ffis.me/about.html" title="关于饭饭">关于</a></li>
-            </ul>
-          </nav>
-        </div>
-        <div>
-          <nav class="cover-navigation navigation--social">
-            <ul class="navigation">
-              <!-- Weibo
-              <li class="navigation_item">
-                <a href="http://weibo.com" title="前往微博" target="_blank"
-                   rel="noopener noreferrer">
-                  <i class="social fa fa-weibo"></i>
-                </a>
-              </li> -->
+<form method="POST" enctype="multipart/form-data" action="/file">
+  <input type="file" name="file1"><br>
+  <input type="file" name="file2"><br>
+  <input type="file" name="file3"><br>
+  <input type="submit" value="上传文件">
+</form>
 
-              <!-- QQ
-              <li class="navigation_item">
-                <a data-v class="wechat" href="#" title="QQ">
-                  <div data-v class="qrCode">
-                    <img data-v src="./Noisky_files/img/qq.png" width="100"
-                         onclick='window.open("./Noisky_files/img/qq.png")' alt="qq">
-                    <div data-v class="triangle-down"></div>
-                  </div>
-                  <i class="social fa fa-qq"></i>
-                </a>
-              </li> -->
-
-              <!-- Telegram -->
-              <li class="navigation_item">
-                <a href="https://telegram.me/Noisky" title="Telegeam @Noisky" target="_blank"
-                   rel="noopener noreferrer">
-                  <i class="social fa fa-telegram"></i>
-                </a>
-              </li>
-
-              <!-- Weixin
-              <li class="navigation_item">
-                <a data-v href="#" title="扫一扫加我微信" class="wechat">
-                  <div data-v class="qrCode">
-                    <img data-v src="./Noisky_files/img/Noisky_weixin.png" width="100"
-                         onclick='window.open("./Noisky_files/img/Noisky_weixin.png")' alt="weixin">
-                    <div data-v class="triangle-down"></div>
-                  </div>
-                  <i class="social fa fa-weixin"></i>
-                </a>
-              </li> -->
-
-              <!-- Github -->
-              <li class="navigation_item">
-                <a href="https://github.com/noisky" title="Github @Noisky" target="_blank"
-                   rel="noopener noreferrer">
-                  <i class="social fa fa-github"></i>
-                </a>
-              </li>
-
-              <!-- RSS -->
-              <li class="navigation_item">
-                <a href="https://ffis.me/feed/" title="RSS" target="_blank" rel="noopener noreferrer">
-                  <i class="social fa fa-rss"></i>
-                </a>
-              </li>
-
-              <!-- Email -->
-              <li class="navigation_item">
-                <a href="mailto:i@ffis.me" title="发邮件给我">
-                  <i class="social fa fa-envelope"></i>
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-      <!-- 底部年份动态化 + 备案号 -->
-      <footer class="footer">
-        <p><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=41019702002681"
-              rel="nofollow noopener noreferrer"
-              target="_blank"><img src="img/policebeian.png" alt="beian" /> 豫公网安备
-          41019702002681号</a><br />
-          Copyright &copy; 2015-<span class="year"></span> Noisky.cn | <a
-                    href="https://beian.miit.gov.cn/" rel="nofollow noopener noreferrer"
-                    target="_blank">豫ICP备16034017号-1</a></p>
-      </footer>
-    </div>
-  </div>
-  <div class="panel-cover--overlay cover-slate"></div>
-</div>
-
-<script type="text/javascript" src="jquery-3.5.0.min.js"></script>
-<script type="text/javascript" src="main.min.js"></script>
-<script src="//v1.hitokoto.cn/?encode=js&select=%23hitokoto" defer></script>
-<!-- 统计代码 -->
 </body>
 </html>

@@ -9,7 +9,6 @@ import com.jerry.request_core.additation.DefaultResourcesDispatcherConfigRegiste
 import com.jerry.request_core.config.Config
 import com.jerry.request_core.constants.FileType
 import com.jerry.request_core.main.R
-import com.jerry.rt.bean.RtConfig
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 
@@ -18,8 +17,6 @@ class A {
     @Bean
     fun setConfig() = Config(appIcon = R.raw.a)
 
-    @Bean
-    fun setRtConfig() = RtConfig(port = 8080)
 
 
     fun customR(r:DefaultResourcesDispatcherConfigRegister.ResourcesDeal){

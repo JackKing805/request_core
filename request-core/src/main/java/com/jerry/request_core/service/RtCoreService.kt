@@ -13,7 +13,6 @@ import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.interfaces.RtCoreListener
-import java.io.InputStream
 
 internal object RtCoreService {
     private var defaultStatus:RtCoreListener.Status? = null
@@ -43,10 +42,6 @@ internal object RtCoreService {
                     override fun onException(exception: Exception) {
                         exception.printStackTrace()
                         "onException:${exception.toString()}".log()
-                    }
-
-                    override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {
-
                     }
 
                     override suspend fun onMessage(

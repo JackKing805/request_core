@@ -14,8 +14,17 @@ import com.jerry.rt.core.http.pojo.Response
 internal object RequestFactory {
     fun onRequestPre(context: Context,request: Request,response: Response,controllerMapper: ControllerMapper?):Boolean{
         val referer = request.getPackage().getHeader().getHeaderValue("Referer","")
-        if (referer.isEmpty() && controllerMapper!=null){
-           val controllerReferrer = ControllerReferrer(controllerMapper.path,controllerMapper.instance,controllerMapper.method)
+        val toController = if (controllerMapper!=null){
+            if (request.getPackage().getRelativePath() == controllerMapper.path){
+                true
+            }else{
+                referer.isEmpty()
+            }
+        }else{
+            false
+        }
+        if (toController){
+           val controllerReferrer = ControllerReferrer(controllerMapper!!.path,controllerMapper.instance,controllerMapper.method)
            InjectFactory.getConfigRegisters().forEach {
                if (!it.instance.onRequestPre(context,request,response,controllerReferrer)){
                    return false
@@ -25,7 +34,7 @@ internal object RequestFactory {
             val rpackage = request.getPackage()
             val query = rpackage.getRequestURI().query
            val fullPath = rpackage.getRequestAbsolutePath()
-           val path = rpackage.getRequestPath()
+           val path = rpackage.getRelativePath()
            val root = rpackage.getRootAbsolutePath()
            var resourcesPath = if (referer.isEmpty() || referer==root){
                path

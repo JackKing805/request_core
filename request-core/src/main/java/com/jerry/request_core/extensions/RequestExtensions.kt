@@ -4,6 +4,8 @@ import android.content.Context
 import com.blankj.utilcode.util.GsonUtils
 import com.jerry.request_core.Core
 import com.jerry.request_core.constants.FileType
+import com.jerry.request_core.exception.NotSupportPathParamsTypeException
+import com.jerry.request_core.exception.PathParamsConvertErrorException
 import com.jerry.request_core.factory.ControllerMapper
 import com.jerry.request_core.utils.JavaUtils
 import com.jerry.rt.core.http.protocol.RtMimeType
@@ -13,6 +15,7 @@ import java.io.InputStreamReader
 import java.net.URI
 import java.net.URL
 import java.net.URLDecoder
+import java.nio.charset.Charset
 
 fun String.fromAssets(): String {
     val stringBuilder = StringBuilder()
@@ -33,6 +36,15 @@ fun String.fromAssets(): String {
     return stringBuilder.toString()
 }
 
+fun String.isAssetsExists():Boolean{
+    return try {
+        Core.getApplication().assets.open(this).close()
+        true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
+    }
+}
 
 fun String.byteArrayFromAssets(): ByteArray? {
     val open = Core.getApplication().assets.open(this)
@@ -83,6 +95,16 @@ fun String.byteArrayFromSdCard(): ByteArray? {
     return readBytes
 }
 
+fun Int.rawExists(): Boolean {
+    return  try {
+        Core.getApplication().resources.openRawResource(this).close()
+        true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
+    }
+
+}
 fun Int.byteArrayFromRaw(): ByteArray? {
     val inputStream = Core.getApplication().resources.openRawResource(this)
     val readBytes = try {
@@ -141,7 +163,7 @@ fun String.getJustPath():String{
     }
 }
 
-fun URI?.parameterToArray(): Map<String, String> {
+fun URI?.parameterToArray(charset: Charset): Map<String, String> {
     return if (this == null) {
         emptyMap()
     } else {
@@ -150,12 +172,21 @@ fun URI?.parameterToArray(): Map<String, String> {
             if (this.query.isNotEmpty()){
                 this.query.split("&").forEach {
                     val split = it.split("=")
-                    map[split[0]] = URLDecoder.decode(split[1], "UTF-8")
+                    map[split[0]] = URLDecoder.decode(split[1], charset.name())
                 }
             }
         }
         map
     }
+}
+
+fun String.parameterToArray(charset: Charset):Map<String,String>{
+    val map = mutableMapOf<String, String>()
+    this.split("&").forEach {
+        val split = it.split("=")
+        map[split[0]] = URLDecoder.decode(split[1], charset.name())
+    }
+    return map
 }
 
 
@@ -273,4 +304,26 @@ infix fun String.samePath(string:String):String{
 }
 
 
+fun String.toBasicTargetType(type:Class<*>):Any{
+    return try {
+        when(type){
+            Int::class.javaObjectType,
+            Int::class.java->this.toInt()
+            Long::class.javaObjectType,
+            Long::class.java->this.toLong()
+            String::class.javaObjectType,
+            String::class.java-> this
+            Boolean::class.javaObjectType,
+            Boolean::class.java->this.toBoolean()
+            Float::class.javaObjectType,
+            Float::class.java->this.toFloat()
+            Double::class.javaObjectType,
+            Double::class.java->this.toDouble()
+            else-> throw NotSupportPathParamsTypeException(type)
+        }
+    }catch (e:NumberFormatException){
+        e.printStackTrace()
+        throw PathParamsConvertErrorException(this,type)
+    }
+}
 

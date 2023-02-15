@@ -3,22 +3,29 @@ package com.jerry.request_core
 import android.app.Application
 import com.jerry.request_core.config.Config
 import com.jerry.request_core.factory.InjectFactory
-import com.jerry.request_core.factory.RequestFactory
 import com.jerry.request_core.interfaces.IRequestListener
 import com.jerry.request_core.service.RtCoreService
 import com.jerry.request_core.service.ServerService
-import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.rt.bean.RtConfig
+import com.jerry.rt.bean.RtFileConfig
+import java.io.File
 
 object Core {
     private lateinit var application: Application
     private var iRequestListener: IRequestListener?=null
-    private var rtConfig = RtConfig()
+    private var rtConfig:RtConfig?=null
+
     private var config = Config(R.raw.favicon)
 
 
     fun init(application: Application,  more:MutableList<Class<*>>){
         Core.application = application
+        rtConfig = RtConfig(
+            rtFileConfig = RtFileConfig(
+                tempFileDir = application.filesDir.absolutePath + File.separatorChar+"temp",
+                saveFileDir = application.filesDir.absolutePath + File.separatorChar+"save"
+            )
+        )
         inject(more)
     }
 
@@ -54,7 +61,7 @@ object Core {
         Core.iRequestListener = iRequestListener
     }
 
-    fun getRtConfig() = rtConfig
+    fun getRtConfig() = rtConfig!!
 
     fun getConfig() = config
 

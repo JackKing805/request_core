@@ -1,10 +1,11 @@
 package com.jerry.request_core.anno
 
 /**
- * 根据名字获取url和body中的参数
+ * /q/b/{id}
+ * 根据名字获取path中的参数
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class ParamsQuery(//查找 url里面的参数或者xxxww里面的参数
+annotation class PathQuery(//查找 url里面的参数或者xxxww里面的参数
     val name: String
 )

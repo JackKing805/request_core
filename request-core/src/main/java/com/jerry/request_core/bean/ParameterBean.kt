@@ -1,30 +1,43 @@
 package com.jerry.request_core.bean
 
-import com.jerry.request_core.exception.NotSupportPathParamsTypeException
+import com.jerry.request_core.extensions.parameterToArray
+import com.jerry.request_core.extensions.toBasicTargetType
+import com.jerry.rt.core.http.pojo.Request
 
 //将url中的参数转化喂bean
 data class ParameterBean(
-    val parameters:Map<String,String>
+    val parameters:MutableMap<String,String>
 ){
+
+    fun add(p:Map<String,String>){
+        parameters.putAll(p)
+    }
     fun find(id:String,clazz: Class<*>):Any?{
         val s = parameters[id]
         if (s!=null){
-            return when(clazz){
-                Int::class.javaObjectType,
-                Int::class.java->s.toInt()
-                Long::class.javaObjectType,
-                Long::class.java->s.toLong()
-                String::class.javaObjectType,
-                String::class.java-> s
-                Boolean::class.javaObjectType,
-                Boolean::class.java->s.toBoolean()
-                Float::class.javaObjectType,
-                Float::class.java->s.toFloat()
-                Double::class.javaObjectType,
-                Double::class.java->s.toDouble()
-                else-> throw NotSupportPathParamsTypeException(clazz)
+            return try {
+                s.toBasicTargetType(clazz)
+            }catch (e:Exception){
+                null
             }
         }
         return null
+    }
+}
+
+class ParametersBeanCreator(private val request:Request){
+    fun create():ParameterBean{
+        val map = mutableMapOf<String,String>()
+        val pathParameters = request.getPackage().getRequestURI().parameterToArray(request.getCharset())
+        map.putAll(pathParameters)
+        val contentType = request.getPackage().getHeader().getContentType()
+        if (contentType=="application/x-www-form-urlencoded"){
+            val body = request.getBody()
+            if (body!=null){
+                val bodyParameters = body.parameterToArray(request.getCharset())
+                map.putAll(bodyParameters)
+            }
+        }
+        return ParameterBean(map)
     }
 }

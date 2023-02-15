@@ -1,23 +1,34 @@
 package com.jerry.request_core.main.request
 
 import android.content.Context
+import android.util.Log
 import com.jerry.request_base.annotations.Controller
+import com.jerry.request_base.bean.RequestMethod
 import com.jerry.request_core.anno.ParamsQuery
 import com.jerry.request_core.constants.FileType
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
-import kotlinx.coroutines.delay
+import com.jerry.rt.core.http.request.model.MultipartFile
 
 @Controller("/")
 class TestController {
     @Controller("/page/{page}")
     suspend fun onRootRequest(context: Context, request: Request, response: Response, @ParamsQuery("page") page:String?):String {
-        delay(5000)
+        Log.e("AA",page?:"")
         if (page==null){
             return FileType.ASSETS.content + "index.html"
         }else{
             return FileType.ASSETS.content + page + ".html"
         }
+    }
+
+    @Controller("/file", requestMethod = RequestMethod.POST)
+    fun upFile(@ParamsQuery("file1") multipartFiles: List<MultipartFile>):String{
+        multipartFiles.forEach {
+            Log.e("AA","file:${it?.getHeader()?.getFileName()}")
+            it.save()
+        }
+        return "redirect:/page/index"
     }
 
     @Controller("/")

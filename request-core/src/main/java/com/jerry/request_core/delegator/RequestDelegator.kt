@@ -1,17 +1,18 @@
 package com.jerry.request_core.delegator
 
 import android.content.Context
+import com.blankj.utilcode.util.GsonUtils
 import com.jerry.request_core.Core
 import com.jerry.request_core.additation.DefaultRtConfigRegister
 import com.jerry.request_core.anno.ExceptionHandler
 import com.jerry.request_core.anno.ExceptionRule
 import com.jerry.request_core.anno.ParamsQuery
+import com.jerry.request_core.anno.PathQuery
 import com.jerry.request_core.bean.ParameterBean
+import com.jerry.request_core.bean.ParametersBeanCreator
 import com.jerry.request_core.exception.InvokeMethodException
-import com.jerry.request_core.exception.NotSupportPathParamsTypeException
-import com.jerry.request_core.exception.PathParamsConvertErrorException
-import com.jerry.request_core.extensions.parameterToArray
 import com.jerry.request_core.extensions.pathParams
+import com.jerry.request_core.extensions.toBasicTargetType
 import com.jerry.request_core.extensions.toObject
 import com.jerry.request_core.factory.InjectFactory
 import com.jerry.request_core.factory.RequestFactory
@@ -22,6 +23,7 @@ import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.core.http.protocol.RtCode
+import com.jerry.rt.core.http.request.model.MultipartFile
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import kotlin.reflect.KClass
@@ -47,73 +49,72 @@ internal object RequestDelegator {
 
 
         if (controllerMapper != null) {
-            if (controllerMapper.requestMethod.content.equals(request.getPackage().method, true)) {
+            if (controllerMapper.requestMethod.content.equals(request.getPackage().getRequestMethod(), true)) {
                 try {
-                    val pbBean = ParameterBean(
-                        request.getPackage()
-                            .getRequestURI().parameterToArray()
-                    )
+                    val multipartFormData = request.getMultipartFormData()
+                    val pbBean = ParametersBeanCreator(request).create()
+                    multipartFormData?.getParameters()?.let {
+                        pbBean.add(it)
+                    }
+                    val body = request.getByteBody()
 
                     val invoke = try {
                         InjectUtils.invokeMethod(
                             controllerMapper.instance,
                             controllerMapper.method
                         ) {
-                            val paramQuery = ReflectUtils.getAnnotation(it, ParamsQuery::class.java)
-                            if (paramQuery != null) {
-                                if (controllerMapper.pathParam!=null){
-                                    if (paramQuery.name == controllerMapper.pathParam.name){
-                                        val pathParams = controllerMapper.pathParams(requestURI.path)
-                                        if (pathParams!=null){
-                                            try {
-                                                when(it.type){
-                                                    Int::class.javaObjectType,
-                                                    Int::class.java->pathParams.toInt()
-                                                    Long::class.javaObjectType,
-                                                    Long::class.java->pathParams.toLong()
-                                                    String::class.javaObjectType,
-                                                    String::class.java-> pathParams
-                                                    Boolean::class.javaObjectType,
-                                                    Boolean::class.java->pathParams.toBoolean()
-                                                    Float::class.javaObjectType,
-                                                    Float::class.java->pathParams.toFloat()
-                                                    Double::class.javaObjectType,
-                                                    Double::class.java->pathParams.toDouble()
-                                                    else-> throw NotSupportPathParamsTypeException(it.type)
-                                                }
-                                            }catch (e:NumberFormatException){
-                                                e.printStackTrace()
-                                                throw PathParamsConvertErrorException(pathParams,it.type)
-                                            }
-                                        }else{
-                                            //如果path里面没有携带参数
-                                            pbBean.find(paramQuery.name,it.type)
-                                        }
+                            val pathQuery = ReflectUtils.getAnnotation(it,PathQuery::class.java)
+                            if (pathQuery!=null) {
+                                if (controllerMapper.pathParam==null){
+                                    throw NullPointerException("this ${request.getPackage().getRelativePath()} not support path request")
+                                }else{
+                                    val pathParams = controllerMapper.pathParams(requestURI.path)
+                                    if (pathParams!=null && controllerMapper.pathParam.name == pathQuery.name){
+                                        pathParams.toBasicTargetType(it.type)
                                     }else{
-                                        //如果path里面没有查找到参数
-                                        pbBean.find(paramQuery.name,it.type)
+                                        null
+                                    }
+                                }
+                            }else{
+                                val paramQuery = ReflectUtils.getAnnotation(it, ParamsQuery::class.java)
+                                val result = if (paramQuery != null) {
+                                    pbBean.find(paramQuery.name,it.type)
+                                }else{
+                                    null
+                                }
+                                if (result==null){
+                                    when (val clazz = it.type) {
+                                        Context::class.java -> {
+                                            context
+                                        }
+                                        Request::class.java -> {
+                                            request
+                                        }
+                                        Response::class.java -> {
+                                            response
+                                        }
+                                        ParameterBean::class.java -> {
+                                            pbBean
+                                        }
+                                        GsonUtils.getListType(MultipartFile::class.java)->{//todo 这里类型判断无法生效
+                                            multipartFormData?.getFiles()?.map { it.value }
+                                        }
+                                        GsonUtils.getMapType(String::class.java,MultipartFile::class.java)->{//todo 这里类型判断无法生效
+                                            multipartFormData?.getFiles()
+                                        }
+                                        MultipartFile::class.java->{
+                                            if (paramQuery!=null){
+                                                multipartFormData?.getFile(paramQuery.name)
+                                            }else{
+                                                multipartFormData?.getFiles()?.map { it.value }?.first()
+                                            }
+                                        }
+                                        else -> {
+                                            request.getByteBody()?.toObject(clazz)
+                                        }
                                     }
                                 }else{
-                                    pbBean.find(paramQuery.name,it.type)
-                                }
-                            } else {
-                                when (val clazz = it.type) {
-                                    Context::class.java -> {
-                                        context
-                                    }
-                                    Request::class.java -> {
-                                        request
-                                    }
-                                    Response::class.java -> {
-                                        response
-                                    }
-                                    ParameterBean::class.java -> {
-                                        pbBean
-                                    }
-                                    else -> {
-                                        val objects = request.getBody().toObject(clazz)
-                                        objects
-                                    }
+                                    result
                                 }
                             }
                         }

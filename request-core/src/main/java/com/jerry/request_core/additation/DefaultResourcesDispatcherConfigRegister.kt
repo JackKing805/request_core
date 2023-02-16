@@ -9,6 +9,7 @@ import com.jerry.request_core.Core
 import com.jerry.request_core.R
 import com.jerry.request_core.constants.FileType
 import com.jerry.request_core.extensions.isAssetsExists
+import com.jerry.request_core.extensions.isFileExists
 import com.jerry.request_core.extensions.rawExists
 import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
@@ -58,10 +59,10 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
                 }
             }
         }
-        dealDefault(response,resourceReferrer.resourcesPath)
+        dealDefault(context,response,resourceReferrer.resourcesPath)
         return true
     }
-    private fun dealDefault(response: Response,resourcesPath:String){
+    private fun dealDefault(context: Context,response: Response,resourcesPath:String){
         fun path():String{
             if (resourcesPath=="favicon.ico"){
                 return FileType.RAW.content + R.raw.favicon
@@ -71,21 +72,7 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
 
         val path = path()
         val fileType = FileType.matchFileType(path) ?: return
-        val r = when(fileType.fileType){
-            FileType.SD_CARD -> {
-                File(fileType.fileName).exists()
-            }
-            FileType.ASSETS -> {
-                fileType.fileName.isAssetsExists()
-            }
-            FileType.APP_FILE -> {
-                File(Core.getApplication().filesDir,fileType.fileName).exists()
-            }
-            FileType.RAW -> {
-                fileType.fileName.toInt().rawExists()
-            }
-        }
-        if (!r){
+        if (!fileType.fileName.isFileExists(context)){
             return
         }
         ResponseUtils.dispatcherReturn(false,response,path())

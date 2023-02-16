@@ -4,6 +4,7 @@ import android.os.Environment
 import com.blankj.utilcode.util.GsonUtils
 import com.jerry.request_core.Core
 import com.jerry.request_core.constants.FileType
+import com.jerry.request_core.exception.IllRedirectProtocolException
 import com.jerry.request_core.extensions.byteArrayFromAssets
 import com.jerry.request_core.extensions.byteArrayFromRaw
 import com.jerry.request_core.extensions.getFileMimeType
@@ -16,6 +17,11 @@ import java.io.File
 
 internal object ResponseUtils{
     private val rootDir = Environment.getExternalStorageDirectory().absolutePath
+
+    private data class Redirect(
+        val path:String,
+        val code:Int
+    )
 
     fun dispatcherError(response: Response, errorCode: Int) {
         response.setResponseStatusCode(errorCode)
@@ -47,23 +53,40 @@ internal object ResponseUtils{
                     val fileType = FileType.matchFileType(returnObject)
                     if (fileType==null){
                         if (returnObject.startsWith("redirect:")){//重定向链接
-                            val newPath = returnObject.replace("redirect:","")
+                            val redirect = if (returnObject.startsWith("redirect-forever:")){//301
+                                Redirect(
+                                    returnObject.replace("redirect-forever:",""),
+                                    RtCode._301.code
+                                )
+                            }else if (returnObject.startsWith("redirect-temporary:")){//307
+                                Redirect(
+                                    returnObject.replace("redirect-temporary:",""),
+                                    RtCode._307.code
+                                )
+                            }else if (returnObject.startsWith("redirect:")){//302
+                                Redirect(
+                                    returnObject.replace("redirect:",""),
+                                    RtCode._302.code
+                                )
+                            }else{
+                                throw IllRedirectProtocolException(returnObject)
+                            }
 
                             val location = if (
-                                newPath.startsWith("https:") ||
-                                newPath.startsWith("http:") ||
-                                newPath.startsWith("ftp:") ||
-                                newPath.startsWith("ws:")
+                                redirect.path.startsWith("https:") ||
+                                redirect.path.startsWith("http:") ||
+                                redirect.path.startsWith("ftp:") ||
+                                redirect.path.startsWith("ws:")
                             ){
-                                newPath
+                                redirect.path
                             }else{
-                                response.getPackage().getRootAbsolutePath() + if (newPath.startsWith("/")){
-                                    newPath.substring(1)
+                                response.getPackage().getRootAbsolutePath() + if (redirect.path.startsWith("/")){
+                                    redirect.path.substring(1)
                                 }else{
-                                    newPath
+                                    redirect.path
                                 }
                             }
-                            response.setResponseStatusCode(RtCode._302.code)
+                            response.setResponseStatusCode(redirect.code)
                             response.setContentType(response.getPackage().getHeader().getContentType())
                             response.setHeader("Location",location)
                             response.sendHeader()

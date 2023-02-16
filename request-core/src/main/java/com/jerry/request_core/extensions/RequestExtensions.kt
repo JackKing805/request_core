@@ -41,7 +41,6 @@ fun String.isAssetsExists():Boolean{
         Core.getApplication().assets.open(this).close()
         true
     } catch (e: Exception) {
-        e.printStackTrace()
         false
     }
 }
@@ -100,7 +99,6 @@ fun Int.rawExists(): Boolean {
         Core.getApplication().resources.openRawResource(this).close()
         true
     } catch (e: Exception) {
-        e.printStackTrace()
         false
     }
 

@@ -25,7 +25,7 @@ class TestController {
     @Controller("/file", requestMethod = RequestMethod.POST)
     fun upFile(@ParamsQuery("file1") multipartFiles: List<MultipartFile>):String{
         multipartFiles.forEach {
-            Log.e("AA","file:${it?.getHeader()?.getFileName()}")
+            Log.e("AA","file:${it.getHeader()?.getFileName()}")
             it.save()
         }
         return "redirect:/page/index"

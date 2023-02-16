@@ -30,7 +30,7 @@ dependencies {
     //tools
     implementation 'com.blankj:utilcodex:1.31.1'
     //rt
-    compileOnly 'com.github.JackKing805:RtCore:0.4.2'
+    compileOnly 'com.github.JackKing805:RtCore:0.4.3'
     //base
     compileOnly 'com.github.JackKing805:request_base:0.1.6'
 

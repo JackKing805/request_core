@@ -17,8 +17,6 @@ class DefaultRtConfigRegister : IConfig() {
         rtClient = clazz as RtClient
     }
 
-
-
     override fun onRequestPre(
         context: Context,
         request: Request,

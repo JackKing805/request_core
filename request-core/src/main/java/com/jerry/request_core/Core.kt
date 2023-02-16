@@ -13,7 +13,7 @@ import java.io.File
 object Core {
     private lateinit var application: Application
     private var iRequestListener: IRequestListener?=null
-    private var rtConfig:RtConfig?=null
+    private lateinit var rtConfig: RtConfig
 
     private var config = Config(R.raw.favicon)
 
@@ -61,7 +61,7 @@ object Core {
         Core.iRequestListener = iRequestListener
     }
 
-    fun getRtConfig() = rtConfig!!
+    fun getRtConfig() = rtConfig
 
     fun getConfig() = config
 

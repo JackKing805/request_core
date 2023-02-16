@@ -13,19 +13,13 @@ import java.io.File
 object Core {
     private lateinit var application: Application
     private var iRequestListener: IRequestListener?=null
-    private lateinit var rtConfig: RtConfig
+    private var rtConfig: RtConfig? = null
 
     private var config = Config(R.raw.favicon)
 
 
     fun init(application: Application,  more:MutableList<Class<*>>){
         Core.application = application
-        rtConfig = RtConfig(
-            rtFileConfig = RtFileConfig(
-                tempFileDir = application.filesDir.absolutePath + File.separatorChar+"temp",
-                saveFileDir = application.filesDir.absolutePath + File.separatorChar+"save"
-            )
-        )
         inject(more)
     }
 
@@ -61,7 +55,12 @@ object Core {
         Core.iRequestListener = iRequestListener
     }
 
-    fun getRtConfig() = rtConfig
+    fun getRtConfig() = rtConfig?:RtConfig(
+        rtFileConfig = RtFileConfig(
+            tempFileDir = application.filesDir.absolutePath + File.separatorChar+"temp",
+            saveFileDir = application.filesDir.absolutePath + File.separatorChar+"save"
+        )
+    )
 
     fun getConfig() = config
 

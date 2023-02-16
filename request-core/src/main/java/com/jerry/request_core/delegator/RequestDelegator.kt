@@ -75,15 +75,13 @@ internal object RequestDelegator {
                                         null
                                     }
                                 }
-                            }else{
+                            }else {
                                 val paramQuery = ReflectUtils.getAnnotation(it, ParamsQuery::class.java)
-                                val result = if (paramQuery != null) {
-                                    pbBean.find(paramQuery.name,it.type)
-                                }else{
+                                (if (paramQuery != null) {
+                                    pbBean.find(paramQuery.name, it.type)
+                                } else {
                                     null
-                                }
-                                if (result==null){
-                                    when (val clazz = it.type) {
+                                }) ?: when (it.parameterizedType) {
                                         Context::class.java -> {
                                             context
                                         }
@@ -96,26 +94,20 @@ internal object RequestDelegator {
                                         ParameterBean::class.java -> {
                                             pbBean
                                         }
-                                        GsonUtils.getListType(MultipartFile::class.java)->{//todo 这里类型判断无法生效
-                                            multipartFormData?.getFiles()?.map { it.value }
-                                        }
-                                        GsonUtils.getMapType(String::class.java,MultipartFile::class.java)->{//todo 这里类型判断无法生效
-                                            multipartFormData?.getFiles()
-                                        }
-                                        MultipartFile::class.java->{
-                                            if (paramQuery!=null){
+                                        GsonUtils.getListType(MultipartFile::class.java) -> multipartFormData?.getFiles()?.map { it.value }
+                                        GsonUtils.getMapType(String::class.java, MultipartFile::class.java) -> multipartFormData?.getFiles()?.map { it.value }
+                                        MultipartFile::class.java -> {
+                                            if (paramQuery != null) {
                                                 multipartFormData?.getFile(paramQuery.name)
-                                            }else{
-                                                multipartFormData?.getFiles()?.map { it.value }?.first()
+                                            } else {
+                                                multipartFormData?.getFiles()?.map { it.value }
+                                                    ?.first()
                                             }
                                         }
                                         else -> {
-                                            request.getByteBody()?.toObject(clazz)
+                                            body?.toObject(it.type)
                                         }
                                     }
-                                }else{
-                                    result
-                                }
                             }
                         }
                     } catch (e: InvokeMethodException) {

@@ -8,6 +8,7 @@ import com.jerry.request_core.exception.NotSupportPathParamsTypeException
 import com.jerry.request_core.exception.PathParamsConvertErrorException
 import com.jerry.request_core.factory.ControllerMapper
 import com.jerry.request_core.utils.JavaUtils
+import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.protocol.RtMimeType
 import java.io.BufferedReader
 import java.io.File
@@ -148,9 +149,11 @@ fun URI.matchUrlPath(localRegisterPath: String): Boolean {
     return path == localRegisterPath
 }
 
+//获取相对路径，获取任何除路径以外的字符串
 fun String.getJustPath():String{
     val uri = URI.create(this)
-    return if (uri.path.length==1){
+
+    var relPath = if (uri.path.length==1){
         uri.path
     }else{
         if (uri.path.endsWith("/")){
@@ -159,6 +162,11 @@ fun String.getJustPath():String{
             uri.path
         }
     }
+
+    if (uri.query!=null){
+        relPath = relPath.replace("?${uri.query}","")
+    }
+    return relPath
 }
 
 fun URI?.parameterToArray(charset: Charset): Map<String, String> {
@@ -188,27 +196,17 @@ fun String.parameterToArray(charset: Charset):Map<String,String>{
 }
 
 
-fun URI.isResources(): Boolean {
-    return if (path == null) {
-        return false
-    } else {
-        if (query==null){
-            if (path.endsWith("/")){
-                false
-            }else{
-                val indexOf = path.lastIndexOf("/")
-                if (indexOf!=-1){
-                    val name = path.substring(indexOf+1)
-                    name.contains(".") && !name.endsWith(".") && !name.startsWith(".")
-                }else{
-                    path.contains(".") && !path.endsWith(".") && !path.startsWith(".")
-                }
-            }
-        }else{
-            false
-        }
-    }
-}
+//fun Request.isResources(): Boolean {
+//    val contentType = getPackage().getHeader().getContentType()
+//    if (contentType.isEmpty()){
+//        return false
+//    }else{
+//        if (
+//            contentType == RtMimeType.matchContentType()
+//        )
+//
+//    }
+//}
 
 /**
  * 只能获取去除域名加端口后的路径，不精确
@@ -292,7 +290,7 @@ fun String.isFileExists(context: Context):Boolean{
             FileType.APP_FILE -> File(this).exists()
         }
     }else{
-        File(this).exists()
+        false
     }
 }
 
@@ -325,3 +323,25 @@ fun String.toBasicTargetType(type:Class<*>):Any{
     }
 }
 
+fun ifIsResourcesName(request: Request):String{
+    val rpackage = request.getPackage()
+    val referer = rpackage.getHeader().getHeaderValue("Referer","")
+    val query = rpackage.getRequestURI().query
+    val fullPath = rpackage.getRequestAbsolutePath()
+    val path = rpackage.getRelativePath()
+    val root = rpackage.getRootAbsolutePath()
+    var resourcesPath = if (referer.isEmpty() || referer==root){
+        path
+    }else{
+        val same = fullPath samePath referer
+        fullPath.replace(same,"")
+    }
+    if (resourcesPath.startsWith("/")){
+        resourcesPath = resourcesPath.substring(1)
+    }
+
+    if (query!=null){
+        resourcesPath = resourcesPath.replace("?$query","")
+    }
+    return resourcesPath
+}

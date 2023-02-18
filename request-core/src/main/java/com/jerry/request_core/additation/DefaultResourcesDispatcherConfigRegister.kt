@@ -8,15 +8,12 @@ import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.Core
 import com.jerry.request_core.R
 import com.jerry.request_core.constants.FileType
-import com.jerry.request_core.extensions.isAssetsExists
 import com.jerry.request_core.extensions.isFileExists
-import com.jerry.request_core.extensions.rawExists
 import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
-import java.io.File
 
 @ConfigRegister(-999999999, registerClass = Any::class)
 class DefaultResourcesDispatcherConfigRegister : IConfig() {
@@ -71,8 +68,7 @@ class DefaultResourcesDispatcherConfigRegister : IConfig() {
         }
 
         val path = path()
-        val fileType = FileType.matchFileType(path) ?: return
-        if (!fileType.fileName.isFileExists(context)){
+        if (!path.isFileExists(context)){
             return
         }
         ResponseUtils.dispatcherReturn(false,response,path())

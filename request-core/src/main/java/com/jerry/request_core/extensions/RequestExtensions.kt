@@ -272,22 +272,22 @@ fun String.isFileExists(context: Context):Boolean{
     val matchFileType = FileType.matchFileType(this)
     return if (matchFileType!=null){
         when(matchFileType.fileType){
-            FileType.SD_CARD -> File(this).exists()
+            FileType.SD_CARD -> File(matchFileType.fileName).exists()
             FileType.ASSETS -> try {
-                val open = context.assets.open(this)
+                val open = context.assets.open(matchFileType.fileName)
                 open.close()
                 true
             }catch (e:Exception){
                 false
             }
             FileType.RAW -> try {
-                val openRawResource = context.resources.openRawResource(this.toInt())
+                val openRawResource = context.resources.openRawResource(matchFileType.fileName.toInt())
                 openRawResource.close()
                 true
             }catch (e:Exception){
                 false
             }
-            FileType.APP_FILE -> File(this).exists()
+            FileType.APP_FILE -> File(matchFileType.fileName).exists()
         }
     }else{
         false

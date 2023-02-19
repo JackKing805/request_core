@@ -4,7 +4,6 @@ import android.content.Context
 import com.jerry.request_base.bean.ControllerReferrer
 import com.jerry.request_base.bean.ControllerResult
 import com.jerry.request_base.bean.ResourceReferrer
-import com.jerry.request_core.extensions.ifIsResourcesName
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 
@@ -18,17 +17,9 @@ internal object RequestFactory {
         response: Response,
         controllerMapper: ControllerMapper?
     ): Boolean {
-        val referer = request.getPackage().getHeader().getHeaderValue("Referer", "")
-        val toController = if (controllerMapper != null) {
-            if (request.getPackage().getRelativePath() == controllerMapper.path) {
-                true
-            } else {
-                referer.isEmpty()
-            }
-        } else {
-            false
-        }
-        if (toController) {
+        val referer = request.getPackage().getHeader().getReferer()
+        val isResourcesRequest = request.isResourceRequest()
+        if (!isResourcesRequest) {
             val controllerReferrer = ControllerReferrer(
                 controllerMapper!!.path,
                 controllerMapper.instance,
@@ -40,8 +31,7 @@ internal object RequestFactory {
                 }
             }
         } else {
-            val resourcesPath = ifIsResourcesName(request)
-            val resourceReferrer = ResourceReferrer(referer, resourcesPath)
+            val resourceReferrer = ResourceReferrer(referer, request.getResourcesPath()!!)
             InjectFactory.getConfigRegisters().forEach {
                 if (!it.instance.onResourceRequest(context, request, response, resourceReferrer)) {
                     return false

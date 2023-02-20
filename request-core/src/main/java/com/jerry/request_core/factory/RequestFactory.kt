@@ -20,14 +20,16 @@ internal object RequestFactory {
         val referer = request.getPackage().getHeader().getReferer()
         val isResourcesRequest = request.isResourceRequest()
         if (!isResourcesRequest) {
-            val controllerReferrer = ControllerReferrer(
-                controllerMapper!!.path,
-                controllerMapper.instance,
-                controllerMapper.method
-            )
-            InjectFactory.getConfigRegisters().forEach {
-                if (!it.instance.onRequestPre(context, request, response, controllerReferrer)) {
-                    return false
+            if (controllerMapper!=null){
+                val controllerReferrer = ControllerReferrer(
+                    controllerMapper.path,
+                    controllerMapper.instance,
+                    controllerMapper.method
+                )
+                InjectFactory.getConfigRegisters().forEach {
+                    if (!it.instance.onRequestPre(context, request, response, controllerReferrer)) {
+                        return false
+                    }
                 }
             }
         } else {

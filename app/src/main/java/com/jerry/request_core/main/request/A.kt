@@ -14,6 +14,7 @@ import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.core.http.protocol.RtContentType
+import java.lang.Thread.sleep
 
 @Configuration
 class A {
@@ -27,17 +28,20 @@ class A {
         }
 
         override fun onRtIn(client: Client, response: Response) {
-            Log.e("AA","onRtIn")
-            response.setContentType(RtContentType.TEXT_PLAIN.content)
-            response.write("hallo：${client.getClientId()}")
+            Log.e("AAWWDA","onRtIn")
+            while (client.isAlive()){
+                sleep(3000)
+                response.setContentType(RtContentType.TEXT_PLAIN.content)
+                response.write("hallo：${client.getClientId()}")
+            }
         }
 
         override fun onRtMessage(request: Request,response: Response) {
-            Log.e("AA","onRtMessage:${request.getBody()}")
+            Log.e("AAWWDA","onRtMessage:${request.getBody()}")
         }
 
         override fun onRtOut(client: Client, response: Response) {
-            Log.e("AA","onRtOut")
+            Log.e("AAWWDA","onRtOut")
         }
     }
 

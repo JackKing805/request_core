@@ -15,7 +15,7 @@ import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 
-@ConfigRegister(-999999999, registerClass = Any::class)
+@ConfigRegister(-1, registerClass = Any::class)
 class DefaultResourcesDispatcherConfigRegister : IConfig() {
     private  val resourcesDispatchers: MutableList<ResourcesDeal> = mutableListOf()
     override fun init(annotation: Configuration, clazz:Any) {

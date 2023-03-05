@@ -54,18 +54,21 @@ internal object RtCoreService {
                     }
 
                     override fun onRtClientIn(client: Client, response: Response) {
+                        "onRtClientIn".log()
                         RequestDelegator.onRtIn(context,client,response)
                     }
 
                     override fun onRtClientOut(client: Client, response: Response) {
+                        "onRtClientOut".log()
                         RequestDelegator.onRtOut(context,client,response)
                     }
 
                     override suspend fun onRtHeartbeat(client: Client) {
-
+                        "onRtHeartbeat".log()
                     }
 
                     override suspend fun onRtMessage(request: Request, response: Response) {
+                        "onRtMessage".log()
                         RequestDelegator.onRtMessage(context,request,response)
                     }
                 })

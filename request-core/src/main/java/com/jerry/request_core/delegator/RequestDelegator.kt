@@ -2,9 +2,7 @@ package com.jerry.request_core.delegator
 
 import android.content.Context
 import com.blankj.utilcode.util.GsonUtils
-import com.jerry.request_base.bean.RequestMethod
 import com.jerry.request_core.Core
-import com.jerry.request_core.additation.DefaultRtConfigRegister
 import com.jerry.request_core.anno.ExceptionHandler
 import com.jerry.request_core.anno.ExceptionRule
 import com.jerry.request_core.anno.ParamsQuery
@@ -12,11 +10,9 @@ import com.jerry.request_core.anno.PathQuery
 import com.jerry.request_core.bean.ParameterBean
 import com.jerry.request_core.bean.ParametersBeanCreator
 import com.jerry.request_core.exception.InvokeMethodException
-import com.jerry.request_core.extensions.isRtRequest
 import com.jerry.request_core.extensions.pathParams
 import com.jerry.request_core.extensions.toBasicTargetType
 import com.jerry.request_core.extensions.toObject
-import com.jerry.request_core.factory.ControllerMapper
 import com.jerry.request_core.factory.InjectFactory
 import com.jerry.request_core.factory.RequestFactory
 import com.jerry.request_core.utils.ResponseUtils
@@ -37,12 +33,7 @@ import kotlin.reflect.KClass
 internal object RequestDelegator {
     internal fun dispatcher(context: Context, request: Request, response: Response) {
         val requestURI = request.getPackage().getRequestURI()
-        val controllerMapper = if (!request.isRtRequest()){
-            RequestFactory.matchController(requestURI.path)
-        }else{
-            val method = Any::class.java.declaredMethods[0]
-            ControllerMapper(Any(), method,RequestMethod.POST,true,"/",null)
-        }
+        val controllerMapper = RequestFactory.matchController(requestURI.path)
         Core.getIRequestListener()?.onRequest(requestURI.path ?: "")
 
 
@@ -153,27 +144,35 @@ internal object RequestDelegator {
 
     internal fun onRtIn(context: Context, client: Client, response: Response) {
         try {
-            (InjectFactory.getBeanBy { it.bean is DefaultRtConfigRegister }?.bean as? DefaultRtConfigRegister)?.onRtIn(
-                context,
-                client,
-                response
-            )
+            InjectFactory.getConfigRegisters().forEach {
+                if (!it.instance.onRtIn(client,response)){
+                    return
+                }
+            }
         } catch (e: Exception) {
             onException(response, e)
         }
     }
 
     internal fun onRtMessage(context: Context, request: Request, response: Response) {
-        dispatcher(context, request, response)
+        try {
+            InjectFactory.getConfigRegisters().forEach {
+                if (!it.instance.onRtMessage(request,response)){
+                    return
+                }
+            }
+        } catch (e: Exception) {
+            onException(response, e)
+        }
     }
 
     internal fun onRtOut(context: Context, client: Client, response: Response) {
         try {
-            (InjectFactory.getBeanBy { it.bean is DefaultRtConfigRegister }?.bean as? DefaultRtConfigRegister)?.onRtOut(
-                context,
-                client,
-                response
-            )
+            InjectFactory.getConfigRegisters().forEach {
+                if (!it.instance.onRtOut(client,response)){
+                    return
+                }
+            }
         } catch (e: Exception) {
             onException(response, e)
         }

@@ -1,17 +1,14 @@
 package com.jerry.request_core.additation
 
-import android.content.Context
 import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.annotations.Configuration
-import com.jerry.request_base.bean.ControllerReferrer
 import com.jerry.request_base.interfaces.IConfig
-import com.jerry.request_core.extensions.isRtRequest
 import com.jerry.request_core.factory.InjectFactory
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 
-@ConfigRegister()
+@ConfigRegister(priority = -1)
 class DefaultRtConfigRegister : IConfig() {
     private var rtClient:RtClient?=null
 
@@ -20,30 +17,18 @@ class DefaultRtConfigRegister : IConfig() {
         rtClient = bean2 as RtClient
     }
 
-    override fun onRequestPre(
-        context: Context,
-        request: Request,
-        response: Response,
-        controllerReferrer: ControllerReferrer
-    ): Boolean {
-        if (request.isRtRequest()){
-            rtClient?.let {
-                if (request.getPackage().getRelativePath() == it.handUrl()){
-                    it.onRtMessage(request,response)
-                }
-            }
-            return false
-        }
-        return true
-    }
-
-
-    fun onRtIn(context: Context,client: Client,response: Response){
+    override fun onRtIn(client: Client, response: Response): Boolean {
         rtClient?.onRtIn(client,response)
+        return false
     }
 
-    fun onRtOut(context: Context,client: Client,response: Response){
+    override fun onRtMessage(request: Request, response: Response): Boolean {
+        rtClient?.onRtMessage(request,response)
+        return false
+    }
+    override fun onRtOut(client: Client, response: Response): Boolean {
         rtClient?.onRtOut(client,response)
+        return false
     }
 
     interface RtClient{

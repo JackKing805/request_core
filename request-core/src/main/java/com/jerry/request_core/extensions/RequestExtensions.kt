@@ -9,7 +9,9 @@ import com.jerry.request_core.exception.PathParamsConvertErrorException
 import com.jerry.request_core.factory.ControllerMapper
 import com.jerry.request_core.utils.JavaUtils
 import com.jerry.rt.core.http.pojo.Request
+import com.jerry.rt.core.http.protocol.RtMethod
 import com.jerry.rt.core.http.protocol.RtMimeType
+import com.jerry.rt.core.http.protocol.RtVersion
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -344,4 +346,9 @@ fun ifIsResourcesName(request: Request):String{
         resourcesPath = resourcesPath.replace("?$query","")
     }
     return resourcesPath
+}
+
+ fun Request.isRtRequest():Boolean{
+    val protocolPackage = getPackage()
+    return protocolPackage.getRequestMethod().equals(RtMethod.RT.content,true) && protocolPackage.getProtocol() == RtVersion.RT_1_0
 }

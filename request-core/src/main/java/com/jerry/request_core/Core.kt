@@ -9,6 +9,7 @@ import com.jerry.request_core.service.ServerService
 import com.jerry.rt.bean.RtConfig
 import com.jerry.rt.bean.RtFileConfig
 import java.io.File
+import java.time.Duration
 
 object Core {
     private lateinit var application: Application
@@ -17,7 +18,8 @@ object Core {
         rtFileConfig = RtFileConfig(
             tempFileDir = "",
             saveFileDir = ""
-        )
+        ),
+        heartbeatReceiverIntervalTime = Duration.ofMinutes(1)
     )
 
     private var config = Config(R.raw.favicon)

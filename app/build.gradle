@@ -40,7 +40,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
 
-    implementation 'com.github.JackKing805:RtCore:0.4.4'
-    implementation 'com.github.JackKing805:request_base:0.1.6'
+    implementation 'com.github.JackKing805:RtCore:0.4.5'
+    implementation 'com.github.JackKing805:request_base:0.1.7'
     implementation project(path: ':request-core')
 }

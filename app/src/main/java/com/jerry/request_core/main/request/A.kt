@@ -6,17 +6,40 @@ import com.jerry.request_base.annotations.Bean
 import com.jerry.request_base.annotations.Configuration
 import com.jerry.request_base.annotations.Inject
 import com.jerry.request_core.additation.DefaultResourcesDispatcherConfigRegister
+import com.jerry.request_core.additation.DefaultRtConfigRegister
 import com.jerry.request_core.config.Config
 import com.jerry.request_core.constants.FileType
 import com.jerry.request_core.main.R
+import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
+import com.jerry.rt.core.http.protocol.RtContentType
 
 @Configuration
 class A {
     @Bean
     fun setConfig() = Config(appIcon = R.raw.a)
 
+    @Bean
+    fun rtClient() = object :DefaultRtConfigRegister.RtClient{
+        override fun handUrl(): String {
+            return "/rt/aa"
+        }
+
+        override fun onRtIn(client: Client, response: Response) {
+            Log.e("AA","onRtIn")
+            response.setContentType(RtContentType.TEXT_PLAIN.content)
+            response.write("hallo：${client.getClientId()}")
+        }
+
+        override fun onRtMessage(request: Request,response: Response) {
+            Log.e("AA","onRtMessage:${request.getBody()}")
+        }
+
+        override fun onRtOut(client: Client, response: Response) {
+            Log.e("AA","onRtOut")
+        }
+    }
 
 
     fun customR(r:DefaultResourcesDispatcherConfigRegister.ResourcesDeal){

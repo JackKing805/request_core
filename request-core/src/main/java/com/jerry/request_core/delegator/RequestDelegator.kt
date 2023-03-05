@@ -2,6 +2,7 @@ package com.jerry.request_core.delegator
 
 import android.content.Context
 import com.blankj.utilcode.util.GsonUtils
+import com.jerry.request_base.bean.RequestMethod
 import com.jerry.request_core.Core
 import com.jerry.request_core.additation.DefaultRtConfigRegister
 import com.jerry.request_core.anno.ExceptionHandler
@@ -11,9 +12,11 @@ import com.jerry.request_core.anno.PathQuery
 import com.jerry.request_core.bean.ParameterBean
 import com.jerry.request_core.bean.ParametersBeanCreator
 import com.jerry.request_core.exception.InvokeMethodException
+import com.jerry.request_core.extensions.isRtRequest
 import com.jerry.request_core.extensions.pathParams
 import com.jerry.request_core.extensions.toBasicTargetType
 import com.jerry.request_core.extensions.toObject
+import com.jerry.request_core.factory.ControllerMapper
 import com.jerry.request_core.factory.InjectFactory
 import com.jerry.request_core.factory.RequestFactory
 import com.jerry.request_core.utils.ResponseUtils
@@ -34,7 +37,12 @@ import kotlin.reflect.KClass
 internal object RequestDelegator {
     internal fun dispatcher(context: Context, request: Request, response: Response) {
         val requestURI = request.getPackage().getRequestURI()
-        val controllerMapper = RequestFactory.matchController(requestURI.path)
+        val controllerMapper = if (!request.isRtRequest()){
+            RequestFactory.matchController(requestURI.path)
+        }else{
+            val method = Any::class.java.declaredMethods[0]
+            ControllerMapper(Any(), method,RequestMethod.POST,true,"/",null)
+        }
         Core.getIRequestListener()?.onRequest(requestURI.path ?: "")
 
 

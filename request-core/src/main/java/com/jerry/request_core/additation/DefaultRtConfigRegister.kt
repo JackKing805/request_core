@@ -14,7 +14,9 @@ class DefaultRtConfigRegister : IConfig() {
 
     override fun init(annotation: Configuration, clazz: Any) {
         val bean2 = InjectFactory.getBean(RtClient::class.java)
-        rtClient = bean2 as RtClient
+        if (bean2!=null){
+            rtClient = bean2 as RtClient
+        }
     }
 
     override fun onRtIn(client: Client, response: Response): Boolean {

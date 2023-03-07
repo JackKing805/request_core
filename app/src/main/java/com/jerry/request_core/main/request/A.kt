@@ -14,7 +14,6 @@ import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.core.http.protocol.RtContentType
-import java.lang.Thread.sleep
 
 @Configuration
 class A {
@@ -22,33 +21,30 @@ class A {
     fun setConfig() = Config(appIcon = R.raw.a)
 
     @Bean
-    fun rtClient() = object :DefaultRtConfigRegister.RtClient{
+    fun rtClient() = object : DefaultRtConfigRegister.RtClient {
         override fun handUrl(): String {
             return "/rt/aa"
         }
 
         override fun onRtIn(client: Client, response: Response) {
-            Log.e("AAWWDA","onRtIn")
-            while (client.isAlive()){
-                sleep(3000)
-                response.setContentType(RtContentType.TEXT_PLAIN.content)
-                response.write("hallo：${client.getClientId()}")
-            }
+            Log.e("AAWWDA", "onRtIn")
         }
 
-        override fun onRtMessage(request: Request,response: Response) {
-            Log.e("AAWWDA","onRtMessage:${request.getBody()}")
+        override fun onRtMessage(request: Request, response: Response) {
+            Log.e("AAWWDA", "onRtMessage:${request.getBody()}")
+            response.setContentType(RtContentType.TEXT_PLAIN.content)
+            response.write("hallo：${request.getPackage().getSession().getId()}")
         }
 
         override fun onRtOut(client: Client, response: Response) {
-            Log.e("AAWWDA","onRtOut")
+            Log.e("AAWWDA", "onRtOut")
         }
     }
 
 
-    fun customR(r:DefaultResourcesDispatcherConfigRegister.ResourcesDeal){
+    fun customR(r: DefaultResourcesDispatcherConfigRegister.ResourcesDeal) {
         r.interceptor("/favicon.ico")
-            .build(object :DefaultResourcesDispatcherConfigRegister.ResourcesDispatcher{
+            .build(object : DefaultResourcesDispatcherConfigRegister.ResourcesDispatcher {
                 override fun onResourcesRequest(
                     context: Context,
                     request: Request,
@@ -62,13 +58,13 @@ class A {
 
     @Bean()
     fun getFun(@Inject("fuckC") c: C): B {
-        Log.e("ADSAD","getFun")
+        Log.e("ADSAD", "getFun")
         return B("${c.name}:from b")
     }
 
     @Bean("fuckC")
     fun getFun2(): C {
-        Log.e("ADSAD","getFun2")
+        Log.e("ADSAD", "getFun2")
         return C("from c")
     }
 }
@@ -78,5 +74,5 @@ data class C(
 )
 
 data class B(
-    val name:String
+    val name: String
 )

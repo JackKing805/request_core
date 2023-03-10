@@ -30,13 +30,11 @@ dependencies {
     //tools
     implementation 'com.blankj:utilcodex:1.31.1'
     //rt
-    compileOnly 'com.github.JackKing805:RtCore:0.5.5'
+    compileOnly 'com.github.JackKing805:RtCore:0.5.6'
     //base
-    compileOnly 'com.github.JackKing805:request_base:0.1.9'
-
-
-    //corou
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    compileOnly 'com.github.JackKing805:request_base:0.2.0'
+    //coroutines
+    compileOnly 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 }
 
 afterEvaluate {
@@ -46,7 +44,7 @@ afterEvaluate {
                 from components.release
                 groupId = "com.jerry"
                 artifactId = "request-core"
-                version = "0.4.4"
+                version = "0.4.5"
             }
         }
     }

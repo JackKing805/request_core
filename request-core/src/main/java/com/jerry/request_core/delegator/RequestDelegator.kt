@@ -142,10 +142,10 @@ internal object RequestDelegator {
     }
 
 
-    internal fun onRtIn(context: Context, client: Client, response: Response) {
+    internal fun onRtIn(context: Context, client: Client,request: Request, response: Response) {
         try {
             InjectFactory.getConfigRegisters().forEach {
-                if (!it.instance.onRtIn(client,response)){
+                if (!it.instance.onRtIn(client,request,response)){
                     return
                 }
             }
@@ -166,15 +166,15 @@ internal object RequestDelegator {
         }
     }
 
-    internal fun onRtOut(context: Context, client: Client, response: Response) {
+    internal fun onRtOut(context: Context, client: Client) {
         try {
             InjectFactory.getConfigRegisters().forEach {
-                if (!it.instance.onRtOut(client,response)){
+                if (!it.instance.onRtOut(client)){
                     return
                 }
             }
         } catch (e: Exception) {
-            onException(response, e)
+            e.printStackTrace()
         }
     }
 

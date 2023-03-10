@@ -19,8 +19,8 @@ class DefaultRtConfigRegister : IConfig() {
         }
     }
 
-    override fun onRtIn(client: Client, response: Response): Boolean {
-        rtClient?.onRtIn(client,response)
+    override fun onRtIn(client: Client,request: Request, response: Response): Boolean {
+        rtClient?.onRtIn(client,request,response)
         return false
     }
 
@@ -28,17 +28,17 @@ class DefaultRtConfigRegister : IConfig() {
         rtClient?.onRtMessage(request,response)
         return false
     }
-    override fun onRtOut(client: Client, response: Response): Boolean {
-        rtClient?.onRtOut(client,response)
+    override fun onRtOut(client: Client): Boolean {
+        rtClient?.onRtOut(client)
         return false
     }
 
     interface RtClient{
         fun handUrl():String
 
-        fun onRtIn(client: Client,response: Response)
+        fun onRtIn(client: Client,request: Request,response: Response)
 
         fun onRtMessage(request: Request,response: Response)
-        fun onRtOut(client: Client,response: Response)
+        fun onRtOut(client: Client)
     }
 }

@@ -26,7 +26,7 @@ class A {
             return "/rt/aa"
         }
 
-        override fun onRtIn(client: Client, response: Response) {
+        override fun onRtIn(client: Client,request: Request, response: Response) {
             Log.e("AAWWDA", "onRtIn")
         }
 
@@ -36,7 +36,7 @@ class A {
             response.write("hallo：${request.getPackage().getSession().getId()}")
         }
 
-        override fun onRtOut(client: Client, response: Response) {
+        override fun onRtOut(client: Client) {
             Log.e("AAWWDA", "onRtOut")
         }
     }

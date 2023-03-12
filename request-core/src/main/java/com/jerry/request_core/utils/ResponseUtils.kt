@@ -101,11 +101,13 @@ internal object ResponseUtils{
                         when(fileType.fileType){
                             FileType.SD_CARD -> {
                                 try {
-                                    if (fileType.fileName.startsWith(rootDir)){
-                                        response.writeFile(File(fileType.fileName))
-                                    }else{
-                                        response.writeFile(File(rootDir,fileType.fileName))
+                                    var file = File(fileType.fileName)
+
+                                    if (!file.exists()){
+                                       file = File(rootDir,fileType.fileName)
                                     }
+
+                                    response.writeFile(file)
                                 }catch (e:Exception){
                                     dispatcherError(response, RtCode._404.code)
                                 }

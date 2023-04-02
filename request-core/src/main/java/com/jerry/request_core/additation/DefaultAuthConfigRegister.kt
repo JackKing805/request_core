@@ -4,11 +4,12 @@ import android.content.Context
 import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.annotations.Configuration
 import com.jerry.request_base.bean.ControllerReferrer
+import com.jerry.request_base.bean.ResourceReferrer
 import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.Core
-import com.jerry.request_core.factory.ControllerMapper
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils
+import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 
@@ -38,6 +39,20 @@ class DefaultAuthConfigRegister : IConfig() {
         }
     }
 
+    override fun onResourceRequest(
+        context: Context,
+        request: Request,
+        response: Response,
+        resourceReferrer: ResourceReferrer
+    ): Boolean {
+        requestInterceptorList.forEach {
+            val pass = it.hand(request, response)
+            if (!pass){
+                return false
+            }
+        }
+        return super.onResourceRequest(context, request, response, resourceReferrer)
+    }
 
     override fun onRequestPre(
         context: Context,
@@ -46,12 +61,32 @@ class DefaultAuthConfigRegister : IConfig() {
         controllerReferrer: ControllerReferrer
     ): Boolean {
         requestInterceptorList.forEach {
-            val pass = it.hand(context, request, response)
+            val pass = it.hand(request, response)
             if (!pass){
                 return false
             }
         }
         return  true
+    }
+
+    override fun onRtIn(client: Client, request: Request, response: Response): Boolean {
+        requestInterceptorList.forEach {
+            val pass = it.hand(request, response)
+            if (!pass){
+                return false
+            }
+        }
+        return super.onRtIn(client, request, response)
+    }
+
+    override fun onRtMessage(request: Request, response: Response): Boolean {
+        requestInterceptorList.forEach {
+            val pass = it.hand(request, response)
+            if (!pass){
+                return false
+            }
+        }
+        return super.onRtMessage(request, response)
     }
 
     class RequestInterceptor(
@@ -70,13 +105,13 @@ class DefaultAuthConfigRegister : IConfig() {
             this.requestHandler = requestHandler
         }
 
-        internal fun hand(context: Context,request: Request,response: Response):Boolean{
+        internal fun hand(request: Request,response: Response):Boolean{
             val requestURI = request.getPackage().getRequestURI()
             val path = requestURI.path?:""
             interceptor.filter {
                 path == it || path.startsWith(it)
             }.forEach { _ ->
-                val pass = requestHandler!!.handle(context, request, response)
+                val pass = requestHandler!!.handle(request, response)
                 if (!pass){
                     return  false
                 }
@@ -86,6 +121,6 @@ class DefaultAuthConfigRegister : IConfig() {
     }
 
     interface IRequestHandler{
-        fun handle(context: Context,request: Request,response: Response):Boolean
+        fun handle(request: Request,response: Response):Boolean
     }
 }

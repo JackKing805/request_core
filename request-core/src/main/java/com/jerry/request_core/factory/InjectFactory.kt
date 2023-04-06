@@ -85,15 +85,20 @@ internal object InjectFactory {
                     val ps = it.parameters
                     val args = mutableListOf<Any>()
                     ps.forEach {
-                        val beanI = getBeanByInjectOrClass(it,it.type)
+                        val beanI = getBeanByInjectOrClass(it, it.type)
 
                         if (beanI != null) {
                             args.add(beanI)
                         } else {
-                            val method = methods.find { a -> ReflectUtils.isSameClass(it.type,a.returnType) }
+                            val method = methods.find { a ->
+                                ReflectUtils.isSameClass(
+                                    it.type,
+                                    a.returnType
+                                )
+                            }
                             if (method != null) {
                                 initBeanMethod(any, arrayOf(method), aInvokeMethods)
-                                val beanI2 = getBeanByInjectOrClass(it,it.type)
+                                val beanI2 = getBeanByInjectOrClass(it, it.type)
                                 if (beanI2 != null) {
                                     args.add(beanI2)
                                 } else {
@@ -131,7 +136,11 @@ internal object InjectFactory {
 
         configurations.forEach { o ->
             registers.forEach { i ->
-                if (ReflectUtils.isSameClass(i.annotation.registerClass.java,o.instance::class.java)) {
+                if (ReflectUtils.isSameClass(
+                        i.annotation.registerClass.java,
+                        o.instance::class.java
+                    )
+                ) {
                     i.instance.init(o.annotation, o.instance)
                 }
             }
@@ -142,8 +151,7 @@ internal object InjectFactory {
         val findPathParams = "(^.*)\\{(.*?)\\}"
         val pathPattern = Pattern.compile(findPathParams)
 
-
-        mutableList.filter { ReflectUtils.haveAnnotation(it,Controller::class.java) }.forEach {
+        mutableList.filter { ReflectUtils.haveAnnotation(it, Controller::class.java) }.forEach {
             val controllerAnnotation = ReflectUtils.getAnnotation(it, Controller::class.java)
             if (controllerAnnotation != null) {
                 val isClassJson = controllerAnnotation.isRest
@@ -167,42 +175,44 @@ internal object InjectFactory {
                         }
 
 
-
                         val fullPath = clazzPath + methodPath
                         val matcher = pathPattern.matcher(fullPath)
-                        val controllerClazzIns = it.newInstance()
-                        val controllerMapper = if (matcher.find()){
+                        val controllerMapper = if (matcher.find()) {
                             val path = matcher.group(1)!!
                             val param = matcher.group(2)!!
-                            if (!path.endsWith("/")){
+                            if (!path.endsWith("/")) {
                                 throw IllPathException(fullPath)
                             }
 
-                            val realPath = if (path.length == 1){
+                            val realPath = if (path.length == 1) {
                                 path
-                            }else{
-                                path.substring(0,path.length-1)
+                            } else {
+                                path.substring(0, path.length - 1)
                             }
 
-                            m.parameters.forEach { mp->
-                                if (ReflectUtils.haveAnnotation(mp,ParamsQuery::class.java) && !mp.type.isBasicType()){
+                            m.parameters.forEach { mp ->
+                                if (ReflectUtils.haveAnnotation(
+                                        mp,
+                                        ParamsQuery::class.java
+                                    ) && !mp.type.isBasicType()
+                                ) {
                                     throw InitErrorException("ParamsQuery must be basic type")
                                 }
                             }
 
                             ControllerMapper(
-                                controllerClazzIns,
+                                it,
                                 m,
                                 mc.requestMethod,
                                 isClassJson or isMethodJson,
                                 path = realPath,
-                                ControllerMapper.PathParams(
+                                ControllerPathParams(
                                     param
                                 )
                             )
-                        }else{
+                        } else {
                             ControllerMapper(
-                                controllerClazzIns,
+                                it,
                                 m,
                                 mc.requestMethod,
                                 isClassJson or isMethodJson,
@@ -223,22 +233,18 @@ internal object InjectFactory {
         beans.forEach {
             injectField(it.bean)
         }
-
-        controllerMappers.forEach {
-            injectField(it.instance)
-        }
     }
 
-    private fun injectField(any:Any) {
+    private fun injectField(any: Any) {
         any::class.java.declaredFields.forEach {
             val haveInject = ReflectUtils.haveAnnotation(it, Inject::class.java)
-            if (haveInject){
+            if (haveInject) {
                 it.isAccessible = true
                 if (it.isAccessible) {
-                    val bean = getBeanByInjectOrClass(it,it.type)
-                    if (bean!=null){
-                        it.set(any,bean)
-                    }else{
+                    val bean = getBeanByInjectOrClass(it, it.type)
+                    if (bean != null) {
+                        it.set(any, bean)
+                    } else {
                         throw NullPointerException("please provider bean:${it.type}")
                     }
                 }
@@ -256,20 +262,20 @@ internal object InjectFactory {
 
         val controllers = getControllers()
 
-        fun fullCheck(controllerPath:String,path:String):Boolean{
+        fun fullCheck(controllerPath: String, path: String): Boolean {
             val justPath = path.getJustPath()
-            return justPath==controllerPath
+            return justPath == controllerPath
         }
 
-        controllers.forEach { t->
-            if (fullCheck(t.path,path)){
+        controllers.forEach { t ->
+            if (fullCheck(t.path, path)) {
                 return t
             }
         }
         val matcher = compile.matcher(path)
-        if (matcher.find()){
+        if (matcher.find()) {
             val rPath = matcher.group(1)!!
-            return controllers.find { it.path==rPath }
+            return controllers.find { it.path == rPath }
         }
         return null
     }
@@ -278,7 +284,7 @@ internal object InjectFactory {
         ReflectUtils.haveAnnotation(
             it.bean::class.java,
             ConfigRegister::class.java
-        ) && ReflectUtils.isSameClass(IConfig::class.java,it.bean::class.java)
+        ) && ReflectUtils.isSameClass(IConfig::class.java, it.bean::class.java)
     }.map {
         ConfigRegisterMapper(
             it.bean as IConfig,
@@ -295,57 +301,57 @@ internal object InjectFactory {
     fun getBeanBy(condition: (BeanMapper) -> Boolean): BeanMapper? =
         listContainsBy(condition).firstOrNull()
 
-    fun getBeanByInjectOrClass(annotatedElement: AnnotatedElement,clazz: Class<*>) = getBeanBy {
-        val inject = ReflectUtils.getAnnotation(annotatedElement,Inject::class.java)
-        if (inject!=null && inject.name.isNotEmpty() && it.beanName.isNotEmpty() ) {
+    fun getBeanByInjectOrClass(annotatedElement: AnnotatedElement, clazz: Class<*>) = getBeanBy {
+        val inject = ReflectUtils.getAnnotation(annotatedElement, Inject::class.java)
+        if (inject != null && inject.name.isNotEmpty() && it.beanName.isNotEmpty()) {
             it.beanName == inject.name
         } else {
-            ReflectUtils.isSameClass(clazz,it.bean::class.java)
+            ReflectUtils.isSameClass(clazz, it.bean::class.java)
         }
     }?.bean
 
-    fun getBean(clazz: Class<*>):Any?{
+    fun getBean(clazz: Class<*>): Any? {
         val list = listContainsBy {
-            ReflectUtils.isSameClass(clazz,it.bean::class.java)
+            ReflectUtils.isSameClass(clazz, it.bean::class.java)
         }
-        if (list.isEmpty()){
+        if (list.isEmpty()) {
             return null
         }
         list.forEach {
-            if (it.bean::class.java==clazz){
+            if (it.bean::class.java == clazz) {
                 return it.bean
             }
         }
         return list.firstOrNull()?.bean
     }
 
-    fun getBean(beanName: String):Any?{
+    fun getBean(beanName: String): Any? {
         return listContainsBy {
-            if (it.beanName.isNotEmpty()){
+            if (it.beanName.isNotEmpty()) {
                 it.beanName == beanName
-            }else{
+            } else {
                 false
             }
         }.firstOrNull()?.bean
     }
 
-    fun <T : Annotation> getAnnotationBean(annotationClass:Class<T>):Any?{
+    fun <T : Annotation> getAnnotationBean(annotationClass: Class<T>): Any? {
         return getBeanBy {
-            ReflectUtils.haveAnnotation(it.bean::class.java,annotationClass)
+            ReflectUtils.haveAnnotation(it.bean::class.java, annotationClass)
         }?.bean
     }
 
     //手动移除bean
-    internal fun removeBean(bean: Any){
+    internal fun removeBean(bean: Any) {
         beans.removeAll {
             it.bean == bean
         }
     }
 
     //手动注入bean
-    internal fun insertBean(bean: Any){
-        if (beans.find { it.bean==bean }==null){
-            beans.add(BeanMapper(bean.javaClass.simpleName,bean))
+    internal fun insertBean(bean: Any) {
+        if (beans.find { it.bean == bean } == null) {
+            beans.add(BeanMapper(bean.javaClass.simpleName, bean))
         }
     }
 }
@@ -366,14 +372,14 @@ internal data class ConfigurationMapper(
 )
 
 internal data class ControllerMapper(
-    val instance: Any,
+    val clazz: Class<*>,
     val method: Method,
     val requestMethod: RequestMethod,
     val isRestController: Boolean,
     val path: String,
-    val pathParam:PathParams?=null,
-){
-    data class PathParams(
-        val name:String
-    )
-}
+    val pathParam: ControllerPathParams? = null,
+)
+
+internal data class ControllerPathParams(
+    val name: String
+)

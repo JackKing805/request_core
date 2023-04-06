@@ -4,10 +4,12 @@ import android.content.Context
 import com.blankj.utilcode.util.GsonUtils
 import com.jerry.request_core.Core
 import com.jerry.request_core.constants.FileType
+import com.jerry.request_core.delegator.RequestController
 import com.jerry.request_core.exception.NotSupportPathParamsTypeException
 import com.jerry.request_core.exception.PathParamsConvertErrorException
 import com.jerry.request_core.factory.ControllerMapper
 import com.jerry.request_core.utils.JavaUtils
+import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.protocol.RtMethod
 import com.jerry.rt.core.http.protocol.RtMimeType
@@ -15,6 +17,7 @@ import com.jerry.rt.core.http.protocol.RtVersion
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import java.lang.reflect.Field
 import java.net.URI
 import java.net.URL
 import java.net.URLDecoder
@@ -252,6 +255,10 @@ internal fun ControllerMapper.pathParams(fullUrl: String): String? {
     }
 }
 
+internal fun RequestController.pathParams(fullUrl: String): String? {
+    return controllerMapper.pathParams(fullUrl)
+}
+
 fun Class<*>.isBasicType(): Boolean {
     return when (this) {
         Int::class.javaObjectType,
@@ -351,4 +358,12 @@ fun ifIsResourcesName(request: Request):String{
  fun Request.isRtRequest():Boolean{
     val protocolPackage = getPackage()
     return protocolPackage.getRequestMethod().equals(RtMethod.RT.content,true) && protocolPackage.getProtocol() == RtVersion.RT_1_0
+}
+
+
+
+
+internal fun ControllerMapper.toRequestController(provider:(pa: Field)->Any?):RequestController{
+    val invokeInstance = InjectUtils.invokeInstance(clazz, provider)
+    return RequestController(invokeInstance,this)
 }

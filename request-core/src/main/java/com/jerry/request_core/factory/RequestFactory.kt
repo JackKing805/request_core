@@ -4,6 +4,7 @@ import android.content.Context
 import com.jerry.request_base.bean.ControllerReferrer
 import com.jerry.request_base.bean.ControllerResult
 import com.jerry.request_base.bean.ResourceReferrer
+import com.jerry.request_core.delegator.RequestController
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 
@@ -15,7 +16,7 @@ internal object RequestFactory {
         context: Context,
         request: Request,
         response: Response,
-        controllerMapper: ControllerMapper?
+        controllerMapper: RequestController?
     ): Boolean {
         val referer = request.getPackage().getHeader().getReferer()
         val isResourcesRequest = request.isResourceRequest()
@@ -47,7 +48,7 @@ internal object RequestFactory {
         context: Context,
         request: Request,
         response: Response,
-        controllerMapper: ControllerMapper,
+        controllerMapper: RequestController,
         result: Any
     ): Boolean {
         InjectFactory.getConfigRegisters().forEach {

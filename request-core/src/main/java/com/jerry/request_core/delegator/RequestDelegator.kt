@@ -2,6 +2,7 @@ package com.jerry.request_core.delegator
 
 import android.content.Context
 import com.blankj.utilcode.util.GsonUtils
+import com.jerry.request_base.bean.RequestMethod
 import com.jerry.request_core.Core
 import com.jerry.request_core.anno.ExceptionHandler
 import com.jerry.request_core.anno.ExceptionRule
@@ -13,16 +14,22 @@ import com.jerry.request_core.exception.InvokeMethodException
 import com.jerry.request_core.extensions.pathParams
 import com.jerry.request_core.extensions.toBasicTargetType
 import com.jerry.request_core.extensions.toObject
+import com.jerry.request_core.extensions.toRequestController
+import com.jerry.request_core.factory.ControllerMapper
+import com.jerry.request_core.factory.ControllerPathParams
 import com.jerry.request_core.factory.InjectFactory
 import com.jerry.request_core.factory.RequestFactory
 import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils
 import com.jerry.rt.core.http.Client
+import com.jerry.rt.core.http.interfaces.ISession
+import com.jerry.rt.core.http.pojo.ProtocolPackage
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.core.http.protocol.RtCode
 import com.jerry.rt.core.http.request.model.MultipartFile
+import java.lang.reflect.Field
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import kotlin.reflect.KClass
@@ -33,9 +40,18 @@ import kotlin.reflect.KClass
 internal object RequestDelegator {
     internal fun dispatcher(context: Context, request: Request, response: Response) {
         val requestURI = request.getPackage().getRequestURI()
-        val controllerMapper = RequestFactory.matchController(requestURI.path)
+        val controllerMapper = RequestFactory.matchController(requestURI.path)?.toRequestController {
+            when(it.type){
+                Request::class.java->request
+                Response::class.java->response
+                ProtocolPackage::class.java->request.getPackage()
+                ISession::class.java->request.getPackage().getSession()
+                Context::class.java->context
+                ProtocolPackage.Header::class.java->request.getPackage().getHeader()
+                else->null
+            }
+        }
         Core.getIRequestListener()?.onRequest(requestURI.path ?: "")
-
 
         try {
             if (!RequestFactory.onRequestPre(context, request, response, controllerMapper)) {
@@ -258,3 +274,14 @@ internal object RequestDelegator {
     }
 }
 
+internal class RequestController(
+    val instance:Any,
+    val controllerMapper: ControllerMapper
+){
+    val clazz: Class<*> = controllerMapper.clazz
+    val method: Method = controllerMapper.method
+    val requestMethod: RequestMethod = controllerMapper.requestMethod
+    val isRestController: Boolean = controllerMapper.isRestController
+    val path: String = controllerMapper.path
+    val pathParam:ControllerPathParams?=controllerMapper.pathParam
+}

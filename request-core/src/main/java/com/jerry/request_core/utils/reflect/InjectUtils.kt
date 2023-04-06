@@ -4,6 +4,7 @@ import com.jerry.request_base.annotations.Inject
 import com.jerry.request_core.exception.InvokeMethodException
 import com.jerry.request_core.factory.InjectFactory
 import java.lang.reflect.AnnotatedElement
+import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
 
@@ -57,6 +58,52 @@ object InjectUtils {
         }catch (e:Exception){
             throw e
         }
+    }
+
+
+    @Throws(Exception::class)
+    fun invokeInstance(clazz: Class<*>,provider:Array<Any> = arrayOf()):Any{
+        val newInstance = clazz.newInstance()
+        val fields = clazz.declaredFields
+        fields.forEach {
+            val haveInject = ReflectUtils.haveAnnotation(it,Inject::class.java)
+            if (haveInject){
+                var injectBean = provider.find { a-> ReflectUtils.isSameClass(it.type,a::class.java) }
+                if (injectBean==null){
+                    injectBean = getInjectBean(
+                        it,
+                        it.type
+                    )
+                }
+
+                it.isAccessible = true
+                it.set(newInstance,injectBean)
+            }
+        }
+        return newInstance
+    }
+
+
+    @Throws(Exception::class)
+    fun invokeInstance(clazz: Class<*>,provider:(pa: Field)->Any?):Any{
+        val newInstance = clazz.newInstance()
+        val fields = clazz.declaredFields
+        fields.forEach {
+            val haveInject = ReflectUtils.haveAnnotation(it,Inject::class.java)
+            if (haveInject){
+                var injectBean = provider(it)
+                if (injectBean==null){
+                    injectBean = getInjectBean(
+                        it,
+                        it.type
+                    )
+                }
+
+                it.isAccessible = true
+                it.set(newInstance,injectBean)
+            }
+        }
+        return newInstance
     }
 
     private fun getInjectBean(any: AnnotatedElement,clazz: Class<*>):Any{

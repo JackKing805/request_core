@@ -19,8 +19,7 @@ object Core {
         rtFileConfig = RtFileConfig(
             tempFileDir = "",
             saveFileDir = ""
-        ),
-        heartbeatReceiverIntervalTime = Duration.ofMinutes(1)
+        )
     )
 
     private var config = Config(R.raw.favicon)
@@ -33,7 +32,10 @@ object Core {
                 tempFileDir = application.filesDir.absolutePath + File.separatorChar + "temp",
                 saveFileDir = application.filesDir.absolutePath + File.separatorChar + "save"
             ),
-            rtTimeOutConfig = RtTimeOutConfig(soTimeout = 1000*2)
+            rtTimeOutConfig = RtTimeOutConfig(
+                soTimeout = 1000*2,
+                heartbeatReceiverIntervalTime = Duration.ofMinutes(1)
+            )
         ))
         inject(more)
     }

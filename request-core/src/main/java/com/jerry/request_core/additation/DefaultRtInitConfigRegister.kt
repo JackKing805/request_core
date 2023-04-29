@@ -42,6 +42,21 @@ class DefaultRtInitConfigRegister : IConfig() {
         if (bean5!=null){
             Core.setRtConfig(Core.getRtConfig().copy(rtTimeOutConfig = bean5 as RtTimeOutConfig))
         }
+
+        val bean6 = InjectFactory.getBean(RtInitConfig::class.java)
+        if (bean6!=null){
+            Core.setRtConfig(Core.getRtConfig().copy(rtInitConfig = bean6 as RtInitConfig))
+        }
+
+        val bean7 = InjectFactory.getBean(RtDataConverter::class.java)
+        if (bean7!=null){
+            Core.setRtConfig(Core.getRtConfig().copy(rtDataConverter = bean7 as RtDataConverter))
+        }
+
+        val bean8 = InjectFactory.getBean(RtResourcesConfig::class.java)
+        if (bean8!=null){
+            Core.setRtConfig(Core.getRtConfig().copy(rtResourcesConfig = bean8 as RtResourcesConfig))
+        }
     }
 
 }

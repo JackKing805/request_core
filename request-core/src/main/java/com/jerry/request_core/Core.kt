@@ -8,9 +8,7 @@ import com.jerry.request_core.service.RtCoreService
 import com.jerry.request_core.service.ServerService
 import com.jerry.rt.bean.RtConfig
 import com.jerry.rt.bean.RtFileConfig
-import com.jerry.rt.bean.RtTimeOutConfig
 import java.io.File
-import java.time.Duration
 
 object Core {
     private lateinit var application: Application
@@ -31,10 +29,6 @@ object Core {
             rtFileConfig = RtFileConfig(
                 tempFileDir = application.filesDir.absolutePath + File.separatorChar + "temp",
                 saveFileDir = application.filesDir.absolutePath + File.separatorChar + "save"
-            ),
-            rtTimeOutConfig = RtTimeOutConfig(
-                soTimeout = 1000*2,
-                heartbeatReceiverIntervalTime = Duration.ofMinutes(1)
             )
         ))
         inject(more)

@@ -15,11 +15,11 @@ android {
         multiDexEnabled true
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
 
 
@@ -30,7 +30,7 @@ dependencies {
     //tools
     implementation 'com.blankj:utilcodex:1.31.1'
     //rt
-    compileOnly 'com.github.JackKing805:RtCore:0.6.8'
+    compileOnly 'com.github.JackKing805:RtCore:0.7.0'
     //base
     compileOnly 'com.github.JackKing805:request_base:0.2.0'
     //coroutines
@@ -44,7 +44,7 @@ afterEvaluate {
                 from components.release
                 groupId = "com.jerry"
                 artifactId = "request-core"
-                version = "0.5.7"
+                version = "0.5.8"
             }
         }
     }

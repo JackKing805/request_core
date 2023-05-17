@@ -10,9 +10,9 @@ import com.jerry.request_core.additation.DefaultRtConfigRegister
 import com.jerry.request_core.config.Config
 import com.jerry.request_core.constants.FileType
 import com.jerry.request_core.main.R
-import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
+import com.jerry.rt.core.http.pojo.RtClient
 import com.jerry.rt.core.http.protocol.RtContentType
 
 @Configuration
@@ -21,12 +21,12 @@ class A {
     fun setConfig() = Config(appIcon = R.raw.a)
 
     @Bean
-    fun rtClient() = object : DefaultRtConfigRegister.RtClient {
+    fun rtClient() = object : DefaultRtConfigRegister.RtClientHandler {
         override fun handUrl(): String {
             return "/rt/aa"
         }
 
-        override fun onRtIn(client: Client,request: Request, response: Response) {
+        override fun onRtIn(client: RtClient, request: Request, response: Response) {
             Log.e("AAWWDA", "onRtIn")
         }
 
@@ -36,7 +36,7 @@ class A {
             response.write("hallo：${request.getPackage().getSession().getId()}")
         }
 
-        override fun onRtOut(client: Client) {
+        override fun onRtOut(client: RtClient) {
             Log.e("AAWWDA", "onRtOut")
         }
     }

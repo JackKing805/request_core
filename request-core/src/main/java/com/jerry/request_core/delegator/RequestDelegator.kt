@@ -22,14 +22,13 @@ import com.jerry.request_core.factory.RequestFactory
 import com.jerry.request_core.utils.ResponseUtils
 import com.jerry.request_core.utils.reflect.InjectUtils
 import com.jerry.request_core.utils.reflect.ReflectUtils
-import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ISession
 import com.jerry.rt.core.http.pojo.ProtocolPackage
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
+import com.jerry.rt.core.http.pojo.RtClient
 import com.jerry.rt.core.http.protocol.RtCode
 import com.jerry.rt.core.http.request.model.MultipartFile
-import java.lang.reflect.Field
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import kotlin.reflect.KClass
@@ -158,7 +157,7 @@ internal object RequestDelegator {
     }
 
 
-    internal fun onRtIn(context: Context, client: Client,request: Request, response: Response) {
+    internal fun onRtIn(context: Context, client: RtClient, request: Request, response: Response) {
         try {
             InjectFactory.getConfigRegisters().forEach {
                 if (!it.instance.onRtIn(client,request,response)){
@@ -182,7 +181,7 @@ internal object RequestDelegator {
         }
     }
 
-    internal fun onRtOut(context: Context, client: Client) {
+    internal fun onRtOut(context: Context, client: RtClient) {
         try {
             InjectFactory.getConfigRegisters().forEach {
                 if (!it.instance.onRtOut(client)){

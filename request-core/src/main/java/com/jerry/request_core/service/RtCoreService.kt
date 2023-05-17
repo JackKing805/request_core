@@ -12,6 +12,7 @@ import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
+import com.jerry.rt.core.http.pojo.RtClient
 import com.jerry.rt.interfaces.RtCoreListener
 
 internal object RtCoreService {
@@ -45,7 +46,7 @@ internal object RtCoreService {
                     }
 
                     override suspend fun onMessage(
-                        client: Client,
+                        client: RtClient,
                         request: Request,
                         response: Response
                     ) {
@@ -53,17 +54,17 @@ internal object RtCoreService {
                         RequestDelegator.dispatcher(context,request,response)
                     }
 
-                    override fun onRtClientIn(client: Client,request: Request, response: Response) {
+                    override fun onRtClientIn(client: RtClient,request: Request, response: Response) {
                         "onRtClientIn".log()
                         RequestDelegator.onRtIn(context,client,request,response)
                     }
 
-                    override fun onRtClientOut(client: Client) {
+                    override fun onRtClientOut(client: RtClient) {
                         "onRtClientOut".log()
                         RequestDelegator.onRtOut(context,client)
                     }
 
-                    override suspend fun onRtHeartbeat(client: Client) {
+                    override suspend fun onRtHeartbeat(client: RtClient) {
                         "onRtHeartbeat".log()
                     }
 

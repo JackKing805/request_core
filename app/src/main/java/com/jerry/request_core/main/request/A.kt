@@ -26,17 +26,17 @@ class A {
             return "/rt/aa"
         }
 
-        override fun onRtIn(client: RtClient, request: Request, response: Response) {
+        override fun onRtIn(context: Context,client: RtClient, request: Request, response: Response) {
             Log.e("AAWWDA", "onRtIn")
         }
 
-        override fun onRtMessage(request: Request, response: Response) {
+        override fun onRtMessage(context: Context,client: RtClient,request: Request, response: Response) {
             Log.e("AAWWDA", "onRtMessage:${request.getBody()}")
             response.setContentType(RtContentType.TEXT_PLAIN.content)
             response.write("hallo：${request.getPackage().getSession().getId()}")
         }
 
-        override fun onRtOut(client: RtClient) {
+        override fun onRtOut(context: Context,client: RtClient) {
             Log.e("AAWWDA", "onRtOut")
         }
     }

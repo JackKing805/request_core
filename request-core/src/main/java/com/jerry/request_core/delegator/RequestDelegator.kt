@@ -160,7 +160,7 @@ internal object RequestDelegator {
     internal fun onRtIn(context: Context, client: RtClient, request: Request, response: Response) {
         try {
             InjectFactory.getConfigRegisters().forEach {
-                if (!it.instance.onRtIn(client,request,response)){
+                if (!it.instance.onRtIn(context,client,request,response)){
                     return
                 }
             }
@@ -169,10 +169,10 @@ internal object RequestDelegator {
         }
     }
 
-    internal fun onRtMessage(context: Context, request: Request, response: Response) {
+    internal fun onRtMessage(context: Context,client: RtClient, request: Request, response: Response) {
         try {
             InjectFactory.getConfigRegisters().forEach {
-                if (!it.instance.onRtMessage(request,response)){
+                if (!it.instance.onRtMessage(context,client,request,response)){
                     return
                 }
             }
@@ -184,7 +184,7 @@ internal object RequestDelegator {
     internal fun onRtOut(context: Context, client: RtClient) {
         try {
             InjectFactory.getConfigRegisters().forEach {
-                if (!it.instance.onRtOut(client)){
+                if (!it.instance.onRtOut(context,client)){
                     return
                 }
             }

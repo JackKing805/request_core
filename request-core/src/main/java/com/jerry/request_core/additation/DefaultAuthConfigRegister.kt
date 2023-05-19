@@ -69,24 +69,24 @@ class DefaultAuthConfigRegister : IConfig() {
         return  true
     }
 
-    override fun onRtIn(client: RtClient, request: Request, response: Response): Boolean {
+    override fun onRtIn(context: Context,client: RtClient, request: Request, response: Response): Boolean {
         requestInterceptorList.forEach {
             val pass = it.hand(request, response)
             if (!pass){
                 return false
             }
         }
-        return super.onRtIn(client, request, response)
+        return super.onRtIn(context,client, request, response)
     }
 
-    override fun onRtMessage(request: Request, response: Response): Boolean {
+    override fun onRtMessage(context: Context,client: RtClient,request: Request, response: Response): Boolean {
         requestInterceptorList.forEach {
             val pass = it.hand(request, response)
             if (!pass){
                 return false
             }
         }
-        return super.onRtMessage(request, response)
+        return super.onRtMessage(context,client,request, response)
     }
 
     class RequestInterceptor(

@@ -26,13 +26,13 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.9.0'
+    compileOnly 'androidx.core:core-ktx:1.9.0'
     //tools
     implementation 'com.blankj:utilcodex:1.31.1'
     //rt
-    compileOnly 'com.github.JackKing805:RtCore:0.7.3'
+    compileOnly 'com.github.JackKing805:RtCore:0.7.4'
     //base
-    compileOnly 'com.github.JackKing805:request_base:0.2.1'
+    compileOnly 'com.github.JackKing805:request_base:0.2.2'
     //coroutines
     compileOnly 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 }
@@ -44,7 +44,7 @@ afterEvaluate {
                 from components.release
                 groupId = "com.jerry"
                 artifactId = "request-core"
-                version = "0.6.1"
+                version = "0.6.2"
             }
         }
     }

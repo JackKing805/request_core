@@ -1,5 +1,6 @@
 package com.jerry.request_core.additation
 
+import android.content.Context
 import com.jerry.request_base.annotations.ConfigRegister
 import com.jerry.request_base.annotations.Configuration
 import com.jerry.request_base.interfaces.IConfig
@@ -19,26 +20,26 @@ class DefaultRtConfigRegister : IConfig() {
         }
     }
 
-    override fun onRtIn(client: RtClient,request: Request, response: Response): Boolean {
-        rtClient?.onRtIn(client,request,response)
+    override fun onRtIn(context: Context,client: RtClient,request: Request, response: Response): Boolean {
+        rtClient?.onRtIn(context,client,request,response)
         return false
     }
 
-    override fun onRtMessage(request: Request, response: Response): Boolean {
-        rtClient?.onRtMessage(request,response)
+    override fun onRtMessage(context: Context,client: RtClient,request: Request, response: Response): Boolean {
+        rtClient?.onRtMessage(context,client,request,response)
         return false
     }
-    override fun onRtOut(client: RtClient): Boolean {
-        rtClient?.onRtOut(client)
+    override fun onRtOut(context: Context,client: RtClient): Boolean {
+        rtClient?.onRtOut(context,client)
         return false
     }
 
     interface RtClientHandler{
         fun handUrl():String
 
-        fun onRtIn(client: RtClient,request: Request,response: Response)
+        fun onRtIn(context: Context,client: RtClient,request: Request,response: Response)
 
-        fun onRtMessage(request: Request,response: Response)
-        fun onRtOut(client: RtClient)
+        fun onRtMessage(context: Context,client: RtClient,request: Request,response: Response)
+        fun onRtOut(context: Context,client: RtClient)
     }
 }

@@ -50,7 +50,7 @@ internal object RequestDelegator {
                 else->null
             }
         }
-        Core.getIRequestListener()?.onRequest(request,response,requestURI.path ?: "")
+        Core.getIRequestListener()?.onRequest(request,response)//url:requestURI.path ?: ""
 
         try {
             if (!RequestFactory.onRequestPre(context, request, response, controllerMapper)) {

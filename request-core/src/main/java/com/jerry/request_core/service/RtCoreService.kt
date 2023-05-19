@@ -45,7 +45,7 @@ internal object RtCoreService {
                         "onException:${exception.toString()}".log()
                     }
 
-                    override suspend fun onMessage(
+                    override fun onMessage(
                         client: RtClient,
                         request: Request,
                         response: Response
@@ -64,13 +64,13 @@ internal object RtCoreService {
                         RequestDelegator.onRtOut(context,client)
                     }
 
-                    override suspend fun onRtHeartbeat(client: RtClient) {
+                    override fun onRtHeartbeat(client: RtClient) {
                         "onRtHeartbeat".log()
                     }
 
-                    override suspend fun onRtMessage(request: Request, response: Response) {
+                    override fun onRtMessage(client: RtClient,request: Request, response: Response) {
                         "onRtMessage".log()
-                        RequestDelegator.onRtMessage(context,request,response)
+                        RequestDelegator.onRtMessage(context,client,request,response)
                     }
                 })
             }

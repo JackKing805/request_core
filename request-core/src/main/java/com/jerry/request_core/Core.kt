@@ -23,19 +23,31 @@ object Core {
     private var config = Config(R.raw.favicon)
 
 
+    //先保存，调用init的时再初始化
+    private val injects = mutableListOf<Class<*>>()
+    private var isInit = false
+
     fun init(application: Application,  more:MutableList<Class<*>>){
+        if (isInit){
+            return
+        }
+        isInit = true
         Core.application = application
-        setRtConfig(rtConfig.copy(
-            rtFileConfig = RtFileConfig(
-                tempFileDir = application.filesDir.absolutePath + File.separatorChar + "temp",
-                saveFileDir = application.filesDir.absolutePath + File.separatorChar + "save"
-            )
-        ))
-        inject(more)
+        if (rtConfig.rtFileConfig.tempFileDir == "" && rtConfig.rtFileConfig.saveFileDir == ""){
+            setRtConfig(rtConfig.copy(
+                rtFileConfig = RtFileConfig(
+                    tempFileDir = application.filesDir.absolutePath + File.separatorChar + "temp",
+                    saveFileDir = application.filesDir.absolutePath + File.separatorChar + "save"
+                )
+            ))
+        }
+        more.addAll(injects)
+        injects.clear()
+        InjectFactory.inject(more)
     }
 
     fun inject(more:MutableList<Class<*>>){
-        InjectFactory.inject(more)
+        injects.addAll(more)
     }
 
     fun setRtConfig(rtConfig: RtConfig){

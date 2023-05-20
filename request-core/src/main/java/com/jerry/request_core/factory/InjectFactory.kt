@@ -1,6 +1,10 @@
 package com.jerry.request_core.factory
 
-import com.jerry.request_base.annotations.*
+import com.jerry.request_base.annotations.Bean
+import com.jerry.request_base.annotations.ConfigRegister
+import com.jerry.request_base.annotations.Configuration
+import com.jerry.request_base.annotations.Controller
+import com.jerry.request_base.annotations.Inject
 import com.jerry.request_base.bean.RequestMethod
 import com.jerry.request_base.interfaces.IConfig
 import com.jerry.request_core.additation.DefaultAuthConfigRegister
@@ -13,7 +17,6 @@ import com.jerry.request_core.exception.InitErrorException
 import com.jerry.request_core.extensions.getJustPath
 import com.jerry.request_core.extensions.isBasicType
 import com.jerry.request_core.utils.reflect.ReflectUtils
-import com.jerry.request_core.utils.reflect.ReflectUtils.injectField
 import java.lang.reflect.AnnotatedElement
 import java.lang.reflect.Method
 import java.util.regex.Pattern
@@ -130,10 +133,6 @@ internal object InjectFactory {
         }
         val registers = getConfigRegisters()
 
-        registers.forEach {
-            it.instance.onCreate()
-        }
-
         configurations.forEach { o ->
             registers.forEach { i ->
                 if (ReflectUtils.isSameClass(
@@ -144,6 +143,10 @@ internal object InjectFactory {
                     i.instance.init(o.annotation, o.instance)
                 }
             }
+        }
+
+        registers.forEach {
+            it.instance.onCreate()
         }
     }
 
